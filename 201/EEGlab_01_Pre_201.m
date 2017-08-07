@@ -18,11 +18,11 @@ else
     labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
-epochStart =  -0.3;
+epochStart =  -0.2;
 epochEnd = 1;
 
-divEpochStart =  -0.3;
-divEpochEnd = 0.6;
+% divEpochStart =  -0.2;
+% divEpochEnd = 0.6;
 
 %% 100 Preparation 
 % %% info based on the input

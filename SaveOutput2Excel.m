@@ -54,22 +54,26 @@ leftElec = 'E58'; % P7
 rightElec = 'E96'; % P8
 rowLogic = logical(strcmp(table_MeanRaw{:, 2}, leftElec) + strcmp(table_MeanRaw{:, 2}, rightElec)); %get all the rows for E58 and E96
 table_LockWindow = table_MeanRaw(rowLogic, :);
+coluNumGrand = size(table_LockWindow,2);
+table_GrandAver = table;
 
-% add the grand average row
-rowNumGrand = size(table_LockWindow,1)+1;
+% add the variable names again and the grand average row
 rowGrandValue = num2cell(mean(table_LockWindow{:,4:end}));
 rowGrand = horzcat({'GrandAverage', [leftElec,rightElec], 'All'},rowGrandValue);
-table_LockWindow(rowNumGrand, :) = rowGrand;
+table_GrandAver(1,1:coluNumGrand) = rowGrand;
+table_GrandAver.Properties.VariableNames = table_LockWindow.Properties.VariableNames;
+table_LockWindow = vertcat(table_LockWindow, rowGrand);
 
-excelName_LockWindow = [expFolder,'_LockingWindow'];
-sheetName_LockWindow = excelName_LockWindow; 
+
+excelName_LockWindow = strcat(saveDir, expFolder, '_LockingWindow_', theDate8, '.xlsx');
+sheetName_LockWindow = 'LockWindow'; 
+sheetName_GrandAver = 'GrandAver';
 
 if ispc || ismac
-    writetable(table_PeakValues, excelName_LockWindow, 'Sheet', sheetName_LockWindow);
+    writetable(table_LockWindow, excelName_LockWindow, 'Sheet', sheetName_LockWindow);
+    writetable(table_GrandAver, excelName_LockWindow, 'Sheet', sheetName_GrandAver);
 else
     disp('Platform not supported')
 end
 
-disp('Save the peak values into the excel file successfully!');
-
-
+disp('Save the data for locking windows into the excel file successfully!');

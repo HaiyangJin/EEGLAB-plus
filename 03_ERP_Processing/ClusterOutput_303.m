@@ -3,13 +3,14 @@
 % expFolder = '202';
 % epochStart = -200;
 
-clusterNums = [65 58 59 66 70 69 64; % PO7
-               90 96 91 84 83 89 95]; % PO8 
-%                58 51 59 65 64 57 50 % P7
-%                96 97 91 90 95 100 101 % P8
+% clusterNums = [65 58 59 66 70 69 64; % PO7
+%                90 96 91 84 83 89 95]; % PO8 
+           
+clusterNums = [58 51 59 65 64 57 50; % P7
+               96 97 91 90 95 100 101]; % P8
 
-windowsInfo = [70,120;...   % time window for P1
-               120,200];    % time window for N170
+windowsInfo = [80,130;   % time window for P1
+               139,169];    % time window for N170
 
           
 %% save the mean data into Excel

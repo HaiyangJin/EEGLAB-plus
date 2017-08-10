@@ -1,8 +1,0 @@
-EEGlab_01_Pre_201
-
-Preprocessing, divide epoches, create the study for this participant
-
--------------------------------------------------------
-EEGlab_02_CreStu_201
-
-Create a study for all the participants

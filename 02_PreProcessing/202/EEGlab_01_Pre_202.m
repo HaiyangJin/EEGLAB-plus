@@ -18,11 +18,11 @@ else
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
 
-epochStart =  -0.3;
-epochEnd = 1;
+epochStart =  -0.2;
+epochEnd = 0.8;
 
-divEpochStart =  -0.3;
-divEpochEnd = 0.6;
+% divEpochStart =  -0.3;
+% divEpochEnd = 0;
 
 %% 100 Preparation 
 % %% info based on the input
@@ -33,7 +33,7 @@ experiment = ['P' experimentNum];   % Pilot,P0; E1,P1; E2,P2.
 addpath('/home/hjin317/eeglab/');
 homePath = '/gpfs1m/projects/uoa00424/'; % the project folder
 ID = getenv('SLURM_ARRAY_TASK_ID');
-participantName = num2str(participantNum(str2num(ID)),[experiment,'%02d']);  %P101
+participantName = num2str(participantNum(str2num(ID)+1),[experiment,'%02d']);  %P101
 
 filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
@@ -49,7 +49,7 @@ ICAName = strcat(participantName, '_02_ICAed_',dt);
 ADJUSTOutputName = [participantName,'_ADJUST_',dt,'.txt'];
 
 % 00 DivEpo
-condSavePath = strcat(filePath, 'DivEpo/');
+condSavePath = strcat(filePath, '04_DivEpo/');
 preProcessedName = strcat(participantName, '_03_PreProcessed_',dt,'.set');
 
 

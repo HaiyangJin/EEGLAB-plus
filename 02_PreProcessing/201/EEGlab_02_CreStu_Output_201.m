@@ -36,7 +36,7 @@ dt = datestr(now,'yymmddHH');
 numParticipant = length(theParticipant);
 studyName = ['EEG_FH_',fileFolder,'_',num2str(numParticipant),'_',dt]; 
 
-loadPath = [filePath,'DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo',filesep]; %input load path
 
 % ID = getenv('SLURM_ARRAY_TASK_ID');
 % participantName = num2str(theParticipant,[experiment,'%02d'])';  %P101

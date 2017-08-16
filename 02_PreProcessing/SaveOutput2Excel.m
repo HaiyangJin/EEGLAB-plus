@@ -49,7 +49,7 @@ end
 
 disp('Save the peak values into the excel file successfully!');
 
-% %% save the data for two electordes to get the grand average data for locking time windows
+%% save the data for two electordes to get the grand average data for locking time windows
 % leftElec = 'E58'; % P7
 % rightElec = 'E96'; % P8
 % rowLogic = logical(strcmp(table_MeanRaw{:, 2}, leftElec) + strcmp(table_MeanRaw{:, 2}, rightElec)); %get all the rows for E58 and E96

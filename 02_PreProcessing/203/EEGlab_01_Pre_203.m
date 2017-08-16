@@ -8,7 +8,7 @@ end
 
 %% input info
 experimentNum = '3';    % the number of experiment
-participantNum = 1:5;  % participant NAMEs :21
+participantNum = 1:14;  % participant NAMEs :21
 
 % DivEpo labels
 if strcmp(experimentNum, '1')
@@ -19,7 +19,7 @@ else
 end
 
 epochStart =  -0.2;
-epochEnd = 0.799;
+epochEnd = 0.8;
 
 % divEpochStart =  -0.3;
 % divEpochEnd = 0.6;
@@ -40,7 +40,9 @@ dt = datestr(now,'yymmddHH');
 fileName = strcat(participantName, '_01_Raw data_', dt, '.set'); % the name of the raw file
 
 % the name of raw file
-if strcmp(participantName,'P301') || strcmp(participantName,'P304') == 1
+oneRawFile = strcmp(participantName,'P301') || strcmp(participantName,'P304')...
+    || strcmp(participantName,'P311');
+if oneRawFile == 1
     rawName = [participantName, '.RAW'];
 else
     rawName = [participantName, '001.RAW'];
@@ -49,7 +51,7 @@ ICAName = strcat(participantName, '_02_ICAed_',dt);
 ADJUSTOutputName = [participantName,'_ADJUST_',dt,'.txt'];
 
 % 00 DivEpo
-condSavePath = strcat(filePath, 'DivEpo/');
+condSavePath = strcat(filePath, '04_DivEpo/');
 preProcessedName = strcat(participantName, '_03_PreProcessed_',dt,'.set');
 
 
@@ -57,7 +59,7 @@ preProcessedName = strcat(participantName, '_03_PreProcessed_',dt,'.set');
 eeglab;
 disp(rawName);
 [ALLEEG EEG CURRENTSET, ALLCOM] = eeglab;
-if strcmp(participantName,'P301') || strcmp(participantName,'P304') == 1
+if oneRawFile == 1
     EEG = pop_readegi([filePath, rawName], [],[],'auto');
 else
     EEG = pop_readsegegi([filePath, rawName]); %'C:\EEG data\202_EEG&Mask\P021\P021001.RAW')

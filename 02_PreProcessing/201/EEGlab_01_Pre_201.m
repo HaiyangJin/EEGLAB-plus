@@ -19,7 +19,7 @@ else
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
 epochStart =  -0.2;
-epochEnd = 1;
+epochEnd = 0.8;
 
 % divEpochStart =  -0.2;
 % divEpochEnd = 0.6;
@@ -49,7 +49,7 @@ ICAName = strcat(participantName, '_02_ICAed_',dt);
 ADJUSTOutputName = [participantName,'_ADJUST_',dt,'.txt'];
 
 % 00 DivEpo
-condSavePath = strcat(filePath, 'DivEpo/');
+condSavePath = strcat(filePath, '04_DivEpo/');
 preProcessedName = strcat(participantName, '_03_PreProcessed_',dt,'.set');
 
 
@@ -143,7 +143,7 @@ EEG = pop_saveset( EEG, 'filename',ICAName,'filepath',filePath);
 % EEG = pop_rejepoch( EEG, stillBads, 0);
 
 %%%% 114 Adjust
-[art] = ADJUST (EEG,ADJUSTOutputName);
+[art] = ADJUST(EEG,ADJUSTOutputName);
 [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 %%%% 115 Removed comoponents

@@ -5,7 +5,7 @@
 
 %% input info
 experimentNum = '1';    % the number of experiment
-theParticipant = [1:19 21]; % input all participant names 
+theParticipant = [1:13 15:19 21]; % input all participant names 
 
 
 %% Preparation
@@ -137,7 +137,7 @@ elseif isunix
     addpath('/home/hjin317/eeglab/');
     homePath = '/gpfs1m/projects/uoa00424/';
     filePath = [homePath,expFolder,'/'];
-    loadPath = [filePath,'DivEpo/']; %input load path
+    loadPath = [filePath,'04_DivEpo/']; %input load path
     saveDir = homePath;
 else
     disp('Platform not supported')
@@ -162,10 +162,10 @@ else
 end
 
 % the electrodes
-% elecAll = {STUDY.changrp.channels};  % all the electrodes in this exp
-elecAll = {'E51', 'E52', 'E58', 'E59', 'E60', 'E63', 'E64', 'E65', 'E66', 'E67', 'E68', 'E69', 'E70', 'E71',...
-           'E76', 'E77', 'E83', 'E84', 'E85', 'E89', 'E90', 'E91', 'E92', 'E94', 'E95', 'E96', 'E97', 'E99',...
-           'E62', 'E73', 'E75'};
+elecAll = {STUDY.changrp.channels};  % all the electrodes in this exp
+% elecAll = {'E51', 'E52', 'E58', 'E59', 'E60', 'E63', 'E64', 'E65', 'E66', 'E67', 'E68', 'E69', 'E70', 'E71',...
+%            'E76', 'E77', 'E83', 'E84', 'E85', 'E89', 'E90', 'E91', 'E92', 'E94', 'E95', 'E96', 'E97', 'E99',...
+%            'E62', 'E73', 'E75'};
 % elecAll = {'E90'};
 
 numLabels = length(labels);
@@ -258,11 +258,14 @@ sheetName_MeanRaw = [expFolder,'_MeanRaw'];
 fileName = strcat(saveDir, sheetName_MeanRaw, '_', theDate8, '.xlsx');
 fileNameBackup = strcat(saveDir, sheetName_MeanRaw, '_', theDate8, '.mat');
 
+% save the chanel location
+chanLocations = ALLEEG(1).chanlocs;
+
 if ispc || ismac
     writetable(table_MeanRaw, fileName, 'Sheet', sheetName_MeanRaw);
-    save(fileNameBackup, 'table_MeanRaw', 'expFolder', '-v7.3') %, '-nocompression'     
+    save(fileNameBackup, 'table_MeanRaw', 'expFolder', 'chanLocations', '-v7.3') %, '-nocompression'     
 elseif isunix
-    save(fileNameBackup, 'table_MeanRaw', 'expFolder', '-v7.3') %, '-nocompression'     
+    save(fileNameBackup, 'table_MeanRaw', 'expFolder', 'chanLocations', '-v7.3') %, '-nocompression'     
 else
     disp('Platform not supported')
 end

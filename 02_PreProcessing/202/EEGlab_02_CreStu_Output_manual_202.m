@@ -36,7 +36,7 @@ dt = datestr(now,'yymmddHH');
 numParticipant = length(theParticipant);
 studyName = ['EEG_FH_',fileFolder,'_',num2str(numParticipant),'_',dt]; 
 
-loadPath = [filePath,'04_DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo_manual',filesep]; %input load path
 
 % ID = getenv('SLURM_ARRAY_TASK_ID');
 % participantName = num2str(theParticipant,[experiment,'%02d'])';  %P101
@@ -137,7 +137,7 @@ elseif isunix
     addpath('/home/hjin317/eeglab/');
     homePath = '/gpfs1m/projects/uoa00424/';
     filePath = [homePath,expFolder,'/'];
-    loadPath = [filePath,'04_DivEpo/']; %input load path
+    loadPath = [filePath,'04_DivEpo_manual/']; %input load path
     saveDir = homePath;
 else
     disp('Platform not supported')

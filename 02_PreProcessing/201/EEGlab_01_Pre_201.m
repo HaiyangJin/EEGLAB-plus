@@ -37,7 +37,7 @@ participantName = num2str(participantNum(str2num(ID)),[experiment,'%02d']);  %P1
 
 filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
-fileName = strcat(participantName, '_01_Raw data_', dt, '.set'); % the name of the raw file
+fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
 % the name of raw file
 if strcmp(participantName,'P106') 
@@ -72,7 +72,7 @@ EEG = pop_saveset( EEG, 'filename',fileName,'filepath',filePath);
 EEG = correctTriggerLatency(EEG,50);
 
 %%%% 103 Re-sample to 250 Hz
-% EEG = pop_resample( EEG, 250);
+% EEG = pop_resample(EEG, 250);
 
 %%%% 104 Filter the data between 1-Hz (high) and 30 Hz (low) 
 EEG  = pop_basicfilter( EEG,  1:128 , 'Cutoff', [ 1 30], 'Design', 'butter', 'Filter', 'bandpass', 'Order',  4, 'RemoveDC', 'on' );
@@ -198,7 +198,7 @@ disp('Divide the epoches successfully!');
 % crete the study only for this participant
 numParticipant = 1;
 studyName = ['EEG_',fileFolder,'_',participantName,'_',dt]; 
-loadPath = [filePath,'DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo',filesep]; %input load path
 numLabel = length(labels);
 
 clear studyDesign

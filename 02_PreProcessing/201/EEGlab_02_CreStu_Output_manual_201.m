@@ -4,8 +4,8 @@
 
 
 %% input info
-experimentNum = '2';    % the number of experiment
-theParticipant = [0:19]; % input all participant names 
+experimentNum = '1';    % the number of experiment
+theParticipant = [1:13 15:21]; % input all participant names 
 
 
 %% Preparation
@@ -19,7 +19,7 @@ if isunix
     homePath = '/gpfs1m/projects/uoa00424/';
     filePath = [homePath,fileFolder,filesep];
 elseif ispc
-    filePath = 'C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis\202_Scramble&LumiMatch\';
+    filePath = 'C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis\201_N170&Time Course\';
 elseif ismac
     error('There are no data saved on Mac.');
 end
@@ -36,7 +36,7 @@ dt = datestr(now,'yymmddHH');
 numParticipant = length(theParticipant);
 studyName = ['EEG_FH_',fileFolder,'_',num2str(numParticipant),'_',dt]; 
 
-loadPath = [filePath,'04_DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo_manual',filesep]; %input load path
 
 % ID = getenv('SLURM_ARRAY_TASK_ID');
 % participantName = num2str(theParticipant,[experiment,'%02d'])';  %P101
@@ -137,7 +137,7 @@ elseif isunix
     addpath('/home/hjin317/eeglab/');
     homePath = '/gpfs1m/projects/uoa00424/';
     filePath = [homePath,expFolder,'/'];
-    loadPath = [filePath,'04_DivEpo/']; %input load path
+    loadPath = [filePath,'04_DivEpo_manual/']; %input load path
     saveDir = homePath;
 else
     disp('Platform not supported')
@@ -254,12 +254,12 @@ table_MeanRaw = cell2table(cell_MeanRaw(2:end,:), 'VariableNames', cell_MeanRaw(
 thisDateVector = now;
 theDate8 = (datestr(thisDateVector,'yyyymmdd'));
 
+% save the chanel locations
+chanLocations = ALLEEG(1).chanlocs;
+
 sheetName_MeanRaw = [expFolder,'_MeanRaw']; 
 fileName = strcat(saveDir, sheetName_MeanRaw, '_', theDate8, '.xlsx');
 fileNameBackup = strcat(saveDir, sheetName_MeanRaw, '_', theDate8, '.mat');
-
-% save the chanel location 
-chanLocations = ALLEEG(1).chanlocs;
 
 if ispc || ismac
     writetable(table_MeanRaw, fileName, 'Sheet', sheetName_MeanRaw);

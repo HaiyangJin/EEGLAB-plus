@@ -22,7 +22,7 @@ epochStart =  -0.2;
 epochEnd = 0.8;
 
 % divEpochStart =  -0.3;
-% divEpochEnd = 0;
+% divEpochEnd = 0.6;
 
 %% 100 Preparation 
 % %% info based on the input
@@ -37,10 +37,10 @@ participantName = num2str(participantNum(str2num(ID)+1),[experiment,'%02d']);  %
 
 filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
-fileName = strcat(participantName, '_01_Raw data_', dt, '.set'); % the name of the raw file
+fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
 % the name of raw file
-if strcmp(participantName,'P209') || strcmp(participantName,'P211') || strcmp(participantName,'P218')  == 1
+if strcmp(participantName,'P209') || strcmp(participantName,'P211')  == 1
     rawName = [participantName, '.RAW'];
 else
     rawName = [participantName, '001.RAW'];
@@ -57,7 +57,7 @@ preProcessedName = strcat(participantName, '_03_PreProcessed_',dt,'.set');
 eeglab;
 disp(rawName);
 [ALLEEG EEG CURRENTSET, ALLCOM] = eeglab;
-if strcmp(participantName,'P209') || strcmp(participantName,'P211') || strcmp(participantName,'P218') == 1
+if strcmp(participantName,'P209') || strcmp(participantName,'P211') == 1
     EEG = pop_readegi([filePath, rawName], [],[],'auto');
 else
     EEG = pop_readsegegi([filePath, rawName]); %'C:\EEG data\202_EEG&Mask\P021\P021001.RAW')
@@ -198,7 +198,7 @@ disp('Divide the epoches successfully!');
 % crete the study only for this participant
 numParticipant = 1;
 studyName = ['EEG_',fileFolder,'_',participantName,'_',dt]; 
-loadPath = [filePath,'DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo',filesep]; %input load path
 numLabel = length(labels);
 
 clear studyDesign

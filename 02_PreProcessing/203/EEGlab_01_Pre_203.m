@@ -8,7 +8,7 @@ end
 
 %% input info
 experimentNum = '3';    % the number of experiment
-participantNum = 1:14;  % participant NAMEs :21
+participantNum = 1:15;  % participant NAMEs :21
 
 % DivEpo labels
 if strcmp(experimentNum, '1')
@@ -37,7 +37,7 @@ participantName = num2str(participantNum(str2num(ID)),[experiment,'%02d']);  %P1
 
 filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
-fileName = strcat(participantName, '_01_Raw data_', dt, '.set'); % the name of the raw file
+fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
 % the name of raw file
 oneRawFile = strcmp(participantName,'P301') || strcmp(participantName,'P304')...
@@ -200,7 +200,7 @@ disp('Divide the epoches successfully!');
 % crete the study only for this participant
 numParticipant = 1;
 studyName = ['EEG_',fileFolder,'_',participantName,'_',dt]; 
-loadPath = [filePath,'DivEpo',filesep]; %input load path
+loadPath = [filePath,'04_DivEpo',filesep]; %input load path
 numLabel = length(labels);
 
 clear studyDesign

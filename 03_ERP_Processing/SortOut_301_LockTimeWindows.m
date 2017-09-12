@@ -6,11 +6,11 @@
 load([saveDir,fileNames]); % load the raw data
 
 % Input info
-experimentNum = [];
-while isempty(experimentNum)
-    experimentNum = input('Please enter the experiment number (1, 2, or 3): ','s');
-end
-expFolder = ['20', num2str(experimentNum)];
+% experimentNum = [];
+% while isempty(experimentNum)
+%     experimentNum = input('Please enter the experiment number (1, 2, or 3): ','s');
+% end
+% expFolder = ['20', num2str(experimentNum)];
 
 leftElec = 'E58';    % P7, center of the assumed cluster
 rightElec = 'E96';   % P8, center of the assumed cluster
@@ -194,7 +194,7 @@ for iTimeWindow = 1:length(rowNames)
     end
 end
 
-if ~strcmp(experimentNum, '1')
+if ~strcmp(expFolder, '201')
     for iLabel = 1:numLabels
         labels{1,iLabel} = labels{1,iLabel}(1:3);
     end

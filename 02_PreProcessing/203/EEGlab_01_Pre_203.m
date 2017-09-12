@@ -8,7 +8,7 @@ end
 
 %% input info
 experimentNum = '3';    % the number of experiment
-participantNum = 1:15;  % participant NAMEs :21
+participantNum = 1:20;  % participant NAMEs :21
 
 % DivEpo labels
 if strcmp(experimentNum, '1')

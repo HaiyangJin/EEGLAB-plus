@@ -42,11 +42,10 @@ dt = datestr(now,'yymmddHH');
 % fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
 % 00 DivEpo
-epochedFolder = '04_DivEpo_manual';
+epochedFolder = '04_DivEpo';
 condSavePath = strcat(filePath, epochedFolder, filesep);
 
 %% load 17ms epoch files
-eeglab;
 % the filename of 17ms epoch data
 d17Filenames = {'NF7+', 'NH7+', 'SF7+', 'SH7+'};
 acclabelNames = {};

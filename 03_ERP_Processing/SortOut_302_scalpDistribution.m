@@ -1,6 +1,6 @@
 %% display the topography to check the location of the cluster
 % load the data for topography
-[fileNames, saveDir] = uigetfile('*.mat', 'Please choose the ''.mat'' file contains the raw mean data for topography.');
+[fileNames, saveDir] = uigetfile('*.mat', 'Please choose the ''.mat'' file contains the raw mean (topo) data for topography.');
 load([saveDir,fileNames]); % load the raw data
 
 numLabel = size(table_TopoData,2);
@@ -30,13 +30,13 @@ for iPotential = 1:numPotential
         
         topoFig = figure('Name',figureName);
         topoplot_EEGlab(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
-            'maplimits', [-4 5]...   % set the maximum and minimum value for all the value
-            ); %             'electrodes', 'labels'... % show the name of the labels on their locations
+            'maplimits', [-4 5],...   % set the maximum and minimum value for all the value
+            'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
 
         colorbar; % show the color bar
         title(['\fontsize{20}', figureName]);
         % topoFig.Color = 'none';  % set the background color as transparent.
-        topoFig.Position = [200, -300, 900, 750]; % resize the window for this figure
+        topoFig.Position = [200, 300, 900, 750]; % resize the window for this figure
 %         set(gcf, 'Position', [200, 200, 900, 750]) 
         
         % print the figure as pdf file

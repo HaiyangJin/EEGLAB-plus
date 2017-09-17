@@ -1,7 +1,8 @@
 %% save the cluster ERP figure into PDF file
 % input info
 
-electrode = [65 90 58 96];
+% electrode = [65 90 58 96]; % exp1 and exp2
+electrode = [90 65 95 64];
 numElec = length(electrode);
 expFolder = ['20', EEG(1).filename(2)];
 

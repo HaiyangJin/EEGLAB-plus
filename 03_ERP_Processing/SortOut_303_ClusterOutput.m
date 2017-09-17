@@ -3,18 +3,21 @@
     'MultiSelect', 'on');
 % expFolder = '202';
 
-windowsInfo = [74,119;   % time window for P1
-              134,160];    % time window for N170
+windowsInfo = [95,123;   % time window for P1
+              144,208];    % time window for N170
 
 %% cluster information
-clusterNumP1 = [65 58 59 66 70 69 64; % PO7
-    90 96 91 84 83 89 95]; % PO8
+% clusterNumP1 = [65 58 59 66 70 69 64; % PO7
+%                 90 96 91 84 83 89 95]; % PO8
+
+clusterNumP1 = [64 57 58 65 69 68 63; % P9
+                95 100 99 94 89 90 96]; % P10
 
 clusterNumN1 = [65 58 59 66 70 69 64; % PO7
-    90 96 91 84 83 89 95]; % PO8
+                90 96 91 84 83 89 95]; % PO8
 
 % clusterNumN1 = [58 51 59 65 64 57 50; % P7
-%     96 97 91 90 95 100 101]; % P8
+%                 96 97 91 90 95 100 101]; % P8
 
 potentials = {clusterNumP1, clusterNumN1};
 potentialNames = {'P1', 'N170'};
@@ -175,4 +178,4 @@ for iPotential = 1:length(potentials)
 end
 
 disp('All Done!!!');
-disp(zeroNum);
+disp(['zeroNum = ',num2str(zeroNum)]);

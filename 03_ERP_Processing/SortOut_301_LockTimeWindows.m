@@ -87,6 +87,12 @@ for iTime = start_Assumed:end_Assumed
     end
 end 
 
+% if there are only two zeros between 0 and 220 ms, set the tempN1_End
+% equals 220
+if nZero == 2
+    tempN1_End = end_Assumed;
+end
+
 % get all the positive time point data for grand average
 grandPositive = table_GrandAver{1, coluNum0+1:end};
 

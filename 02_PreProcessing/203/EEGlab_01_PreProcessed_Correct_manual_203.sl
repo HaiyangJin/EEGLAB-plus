@@ -8,4 +8,4 @@
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
 #SBATCH --array=1-19    # Array definition 1-10     14,16-21
 module load MATLAB/2016b
-srun matlab -nodesktop -nosplash -r EEGlab_01_PreProcessed_Correct_203 $SLURM_ARRAY_TASK_ID
+srun matlab -nodesktop -nosplash -r EEGlab_01_PreProcessed_Correct_manual_203 $SLURM_ARRAY_TASK_ID

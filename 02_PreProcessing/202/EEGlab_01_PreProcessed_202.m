@@ -44,7 +44,7 @@ condSavePath = strcat(filePath, '04_DivEpo_manual', filesep);
 
 %% load PreProcessed files 
 % the filename of PreProcessed data
-preProcessedName = strcat(participantName, '_03_PreProcessed_1000','.set');
+preProcessedName = strcat(participantName, '_03_PreProcessed_manual','.set');
 preProcessedFolder = '03_PreProcessed_manual';
 prePath = [filePath, preProcessedFolder, filesep];
 

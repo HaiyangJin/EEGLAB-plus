@@ -7,7 +7,6 @@
 experimentNum = '3';    % the number of experiment
 theParticipant = [1:3 5:8 10:15 18 19]; % input all participant names 
 
-
 %% Preparation
 % info based on input   
 fileFolder = ['20' experimentNum];  % pilot,201,202
@@ -19,7 +18,7 @@ if isunix
     homePath = '/gpfs1m/projects/uoa00424/';
     filePath = [homePath,fileFolder,filesep];
 elseif ispc
-    filePath = 'C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis\202_Scramble&LumiMatch\';
+    filePath = 'C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis\02_-100_Baseline\203_SL_Mask';
 elseif ismac
     error('There are no data saved on Mac.');
 end
@@ -31,20 +30,19 @@ end
 %     labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
 %               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 % end
-labels = {'NF7+_RES0' 'NF7+_RES1'  'NF5+'  'NF1+'  'NF2+'  'NH7+_RES0' 'NH7+_RES1' 'NH5+'  'NH1+'  'NH2+' ...
-          'SF7+_RES0' 'SF7+_RES1'  'SF5+'  'SF1+'  'SF2+'  'SH7+_RES0' 'SH7+_RES1' 'SH5+'  'SH1+'  'SH2+'};
+labels = {'NF7+_RES0'  'NF7+_RES1'  'NF5+_RES1'  'NF1+_RES1'  'NF2+_RES1'  'NH7+_RES0' 'NH7+_RES1' 'NH5+_RES1'  'NH1+_RES1'  'NH2+_RES1' ...
+          'SF7+'  'SF5+'  'SF1+'  'SF2+' 'SH7+'  'SH5+' 'SH1+'  'SH2+'};
       % the labels divided the correct and incorrect trials for 17ms
       % condition
 
 dt = datestr(now,'yymmddHH');
 numParticipant = length(theParticipant);
-studyName = ['EEG_FH_',fileFolder,'_acc_',num2str(numParticipant),'_',dt]; 
+studyName = ['EEG_FH_',fileFolder,'_Acc_',num2str(numParticipant),'_',dt]; 
 
 loadPath = [filePath,'04_DivEpo_manual',filesep]; %input load path
 
 % ID = getenv('SLURM_ARRAY_TASK_ID');
 % participantName = num2str(theParticipant,[experiment,'%02d'])';  %P101
-
 
 %% create the array for the experiment desgin and then create the study
 % create the experiment design
@@ -92,6 +90,8 @@ CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:length(EEG)];
 
 disp(['Save the study for ', num2str(numParticipant), ' participant successfully!']);
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 303 this file outputs all ERP data for different electrode, condition and 
 % every participant in one sheet in Excel. And output the peak value
 % information.
@@ -100,12 +100,13 @@ disp(['Save the study for ', num2str(numParticipant), ' participant successfully
 % every electrodes
 
 % Please change the IVs for labels for different experiment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% input info
 % for mean of raw data
 studyName4Cluster = ' ';
 if ~exist('experimentNum')
-    experimentNum = '1';   % the number of experiment
+    experimentNum = '3';   % the number of experiment
 end
 % theParticipant = [0:19]; % input all participant names  :13 15 
 
@@ -156,14 +157,14 @@ CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:length(EEG)];
 %% %%%% Output the mean of raw data into excel %%%% %%
 % Preparation 
 % labels
-if strcmp(experimentNum, '1') || strcmp(experimentNum, '4')
-    labels = {'F017' 'F050'  'F100'  'F200'  'H017'  'H050'  'H100'  'H200'};
-elseif strcmp(experimentNum, '2') || strcmp(experimentNum, '3')
-    labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
-              'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
-else
-    error('No labels assigned for this study.');
-end
+% if strcmp(experimentNum, '1') || strcmp(experimentNum, '4')
+%     labels = {'F017' 'F050'  'F100'  'F200'  'H017'  'H050'  'H100'  'H200'};
+% elseif strcmp(experimentNum, '2') || strcmp(experimentNum, '3')
+%     labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
+%               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
+% else
+%     error('No labels assigned for this study.');
+% end
 
 % the electrodes
 elecAll = {STUDY.changrp.channels};  % all the electrodes in this exp
@@ -280,10 +281,12 @@ end
 
 disp('Save the mean data into the excel successfully!');
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%% 304 Output the peak value %%%% %%
 % Preparation
 % [fileName, saveDir] = uigetfile('*.mat', 'Select the .mat file for raw mean data');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % info about CELL for the peak values
 peakValue_IVs = [meanRaw_IVs, {'NS', 'FH', 'Duration'}];

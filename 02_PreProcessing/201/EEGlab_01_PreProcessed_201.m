@@ -9,7 +9,7 @@ end
 
 %% input info
 experimentNum = '1';    % the number of experiment
-participantNum = 1:21;  % participant NAMEs :21
+participantNum = [1:21];  % participant NAMEs :21
 
 % DivEpo labels
 if strcmp(experimentNum, '1')
@@ -18,7 +18,7 @@ else
     labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
-epochStart =  -0.2;
+epochStart =  -0.1;
 epochEnd = 0.8;
 
 % divEpochStart =  -0.2;
@@ -39,21 +39,17 @@ filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
 % fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
-% the name of raw file
-ICAName = strcat(participantName, '_02_ICAed_',dt);
-ADJUSTOutputName = [participantName,'_ADJUST_',dt,'.txt'];
-
 % 00 DivEpo
 condSavePath = strcat(filePath, '04_DivEpo_manual', filesep);
 
 %% load PreProcessed files 
 % the filename of PreProcessed data
-preProcessedName = strcat(participantName, '_03_PreProcessed_1000','.set');
+preProcessedName = strcat(participantName, '_03_PreProcessed_manual','.set');
 preProcessedFolder = '03_PreProcessed_manual';
-filePath = [filePath, preProcessedFolder, filesep];
+prePath = [filePath, preProcessedFolder, filesep];
 
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_loadset('filename',preProcessedName,'filepath',filePath);
+EEG = pop_loadset('filename',preProcessedName,'filepath',prePath);
 [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
 
 %%%% 116 Reject epoch
@@ -72,7 +68,7 @@ for j = 1:length(labels)
 
     % 01 load PreProcessed files
     STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
-    EEG = pop_loadset('filename',preProcessedName,'filepath',filePath);
+    EEG = pop_loadset('filename',preProcessedName,'filepath',prePath);
     [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
 
     % 02 select event for each condition

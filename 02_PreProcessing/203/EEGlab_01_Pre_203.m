@@ -18,7 +18,7 @@ else
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
 
-epochStart =  -0.2;
+epochStart =  -0.1;
 epochEnd = 0.8;
 
 % divEpochStart =  -0.3;

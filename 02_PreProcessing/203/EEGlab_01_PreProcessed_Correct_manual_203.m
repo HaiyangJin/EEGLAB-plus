@@ -20,7 +20,7 @@ else
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
 
-epochStart =  -0.2;
+epochStart =  -0.1;
 epochEnd = 0.8;
 
 % divEpochStart =  -0.2;
@@ -39,39 +39,31 @@ participantName = num2str(participantNum(str2num(ID)),[experiment,'%02d']);  %P1
 
 filePath = [homePath,fileFolder,filesep];
 dt = datestr(now,'yymmddHH');
-% fileName = strcat(participantName, '_01_Raw data', '.set'); % the name of the raw file
 
 % 00 DivEpo
-epochedFolder = '04_DivEpo_manual';
+epochedFolder = '04_DivEpo_manual';  % the folder where the data are stored
 condSavePath = strcat(filePath, epochedFolder, filesep);
 
-%% load 17ms epoch files
+% run eeglab
 eeglab;
-% the filename of 17ms epoch data
-d17Filenames = {'NF7+', 'NH7+', 'SF7+', 'SH7+'};
+
+%% load epoch files and divide data into correct and incorrect groups
+numLabel = length(labels)/2;
 acclabelNames = {};
-for iFilename = 1:4
-    tempEpochFilename = d17Filenames{1,iFilename};
+for iFilename = 1:numLabel
+    tempEpochFilename = labels{1,iFilename};
     epochedFilename = strcat(participantName, '_04_', tempEpochFilename,'.set');
-    prePath = [filePath, epochedFolder, filesep];
+    prePath = [filePath, epochedFolder, filesep];   
     
-%     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-%     EEG = pop_loadset('filename',epochedFilename,'filepath',prePath);
-%     [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
-%     
-%     %%%% 116 Reject epoch
-%     EEG = pop_eegthresh(EEG,1,[1:128] ,-100,100,epochStart,epochEnd,2,0);
-%     
-%     %%%% 117 Baseline correction
-%     EEG = pop_rmbase( EEG, [epochStart*1000 0]);
-%     [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-%     
-%     disp('Save the preProcessed file successfully!');
-%     
+    % save the correct trials for all and the incorrect trials for 17ms
+    no17Ppts = ismember(str2num(ID),[4, 9, 16 17]); % these participants don't have enough trials for incorrect trials
+    if strcmp(tempEpochFilename(3),'7') && ~no17Ppts
+        startLabel = 1;
+    else 
+        startLabel = 2;
+    end
     
-    %% 201 Divide data into different conditions and also based on correct and incorrect trials
-    
-    for j = 1:length(accLabels)
+    for accLabel = startLabel:length(accLabels)
         
         % 01 load PreProcessed files
         STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
@@ -79,20 +71,19 @@ for iFilename = 1:4
         [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
         
         % 02 select event for each condition
-        theLabel = accLabels(j);
-        tempLabelName = [tempEpochFilename, '_', accLabels{j}];
+        theACCLabel = accLabels(accLabel);
+        tempLabelName = [tempEpochFilename, '_', accLabels{accLabel}];
         labelName = strcat(participantName, '_04_', tempLabelName);
         % labelFile = strcat(loadPath,labelName);
         
         EEG = eeg_checkset( EEG );
-        EEG = pop_selectevent( EEG, 'type',theLabel,'deleteevents','off','deleteepochs','on','invertepochs','off');
+        EEG = pop_selectevent( EEG, 'type',theACCLabel,'deleteevents','off','deleteepochs','on','invertepochs','off');
         %     EEG = pop_epoch( EEG, label, [divEpochStart divEpochEnd], 'newname', labelName, 'epochinfo', 'yes');
         [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off');
         EEG = eeg_checkset( EEG );
         [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'setname',labelName,'gui','off');
         EEG = eeg_checkset( EEG );
         EEG = pop_saveset( EEG, 'filename',labelName,'filepath',condSavePath);
-        EEG = eeg_checkset( EEG );
         acclabelNames = horzcat(acclabelNames,{tempLabelName});
     end
 end
@@ -104,9 +95,7 @@ disp('Divide the epoches successfully!');
 numParticipant = 1;
 studyName = ['EEG_',fileFolder,'_',participantName,'_ACC',dt]; 
 loadPath = [filePath, epochedFolder ,filesep]; %input load path
-labelForStudy = horzcat({'NF5+'  'NF1+'  'NF2+'  'NH5+'  'NH1+'  'NH2+' ...
-                        'SF5+'  'SF1+'  'SF2+'  'SH5+'  'SH1+'  'SH2+' ...
-                 },acclabelNames);
+labelForStudy = acclabelNames;
 numLabel = length(labelForStudy); % length(accLabels)*2+length(labels);
 
 clear studyDesign

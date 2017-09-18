@@ -18,7 +18,7 @@ else
     labels = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
               'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
 end
-epochStart =  -0.2;
+epochStart =  -0.1;
 epochEnd = 0.8;
 
 % divEpochStart =  -0.2;
@@ -60,6 +60,10 @@ EEG = pop_rmbase( EEG, [epochStart*1000 0]);
 [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 disp('Save the preProcessed file successfully!');
+
+%%%% 118 Linear detrend
+EEG = eeg_detrend(EEG);
+eeg_store(ALLEEG, EEG, CURRENTSET);
 
 
 %% 201 Divide data into different conditions

@@ -5,7 +5,7 @@
 
 %% input info
 experimentNum = '3';    % the number of experiment
-theParticipant = [1:3 5:8 10:15 18 19]; % input all participant names 
+theParticipant = [1:3 5:8 10:15 18 19 20]; % input all participant names 
 
 %% Preparation
 % info based on input   

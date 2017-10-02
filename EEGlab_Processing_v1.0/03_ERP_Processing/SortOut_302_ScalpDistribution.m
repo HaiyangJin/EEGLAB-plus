@@ -29,7 +29,7 @@ for iPotential = 1:numPotential
         topoData = table_TopoData{iPotential,iLabel};
         
         topoFig = figure('Name',figureName);
-        topoplot_EEGlab(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
+        topoplot(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
             'maplimits', [-4 5],...   % set the maximum and minimum value for all the value
             'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
 

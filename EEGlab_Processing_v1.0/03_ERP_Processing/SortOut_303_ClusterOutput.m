@@ -179,3 +179,102 @@ end
 
 disp('All Done!!!');
 disp(['zeroNum = ',num2str(zeroNum)]);
+
+
+
+
+
+%% variableNames for peak values
+%% find and output the peak values
+% create the cell for IVs and DVs of peak values
+clear cell_PeakValueIVs
+cell_PeakValueIVs = cell(numRow_PeakValue, numColu_PeakValueIVs);
+cell_PeakValueIVs(1,:) = peakValue_IVs;
+
+clear cell_PeakValueDVs
+cell_PeakValueDVs = cell(numRow_PeakValue, numColu_PeakValueDVs);
+tempRowNames = {'Potential','Latency'};
+for iW = 1:numWindows
+    cell_PeakValueDVs(1,(2*iW-1:2*iW)) = arrayfun(@(x) strcat(windowNames{1,iW},'_',x), tempRowNames);
+end
+
+% copy the first three columns (IVs) from cell_MeanRaw
+cell_PeakValueIVs(2:end,1:numColu_MeanRawIVs) = cell_MeanRawIVs(2:end,:);
+
+% get the row data (only the DVs)
+data2Check = cell_MeanRawDVs;
+
+for iRow = 2:numRow_PeakValue
+    % the row data for this round
+    tempRowData = data2Check(iRow,:);
+        
+    % save the (three) IVs about lables into the peak value data cell
+    thisLabel = cell_PeakValueIVs{iRow, labelColuNum};
+    if strcmp(experimentNum, '1') || strcmp(experimentNum, '4')
+        cell_PeakValueIVs(iRow, NSColuNum) = {'N'};
+        cell_PeakValueIVs(iRow, FHColuNum) = {thisLabel(1)};
+        cell_PeakValueIVs(iRow, DurationColuNum) = {thisLabel(2:4)};
+    elseif strcmp(experimentNum, '2') || strcmp(experimentNum, '3')
+        cell_PeakValueIVs(iRow, NSColuNum) = {thisLabel(1)};
+        cell_PeakValueIVs(iRow, FHColuNum) = {thisLabel(2)};
+        cell_PeakValueIVs(iRow, DurationColuNum) = {thisLabel(3)};
+    end
+    
+    % find and save the peak values
+    for iWindow = 1:numWindows
+        
+        thisWindowStart = windowsInfo(iWindow,1);
+        thisWindowEnd = windowsInfo(iWindow,2);
+        
+        windowStartPoint = abs(epochStart) + thisWindowStart;
+        windowEndPoint = abs(epochStart) + thisWindowEnd;
+        
+        % the data to be checked for peak values
+        dataInThisWindow = cell2mat(tempRowData(1, windowStartPoint:windowEndPoint));
+        
+        if windowPN(iWindow) > 0
+            [tempPeakValue, tempColu] = max(dataInThisWindow);
+            tempMeanPeak = mean(cell2mat(data2Check(iRow,tempColu + windowStartPoint + [-peak2Cal:peak2Cal])));
+            tempLatency = data2Check{1,tempColu + windowStartPoint + [-peak2Cal:peak2Cal]};
+        elseif windowPN(iWindow) < 0
+            [tempPeakValue, tempColu] = min(dataInThisWindow);
+            tempMeanPeak = mean(cell2mat(data2Check(iRow,tempColu + windowStartPoint + [-peak2Cal:peak2Cal])));
+            tempLatency = data2Check{1,tempColu + windowStartPoint + [-peak2Cal:peak2Cal]};
+        else 
+            tempMeanPeak = [];
+            tempLatency = [];
+        end
+        
+        % save the value data and latency into the data cell
+        cell_PeakValueDVs(iRow, 2*iWindow-1) = {tempMeanPeak};
+        cell_PeakValueDVs(iRow, 2*iWindow) = {tempLatency};
+     
+    end
+end
+
+clear thisLabel
+
+% coombine the two cells (IVs and DVs) together and convert to table
+cell_PeakValue = [cell_PeakValueIVs, cell_PeakValueDVs];
+table_PeakValues = cell2table(cell_PeakValue(2:end,:), 'VariableNames', cell_PeakValue(1,:));
+
+% save the peak value into the excel or variable
+thisDateVector = now;
+dt = (datestr(thisDateVector,'yyyymmdd'));
+
+sheetName_PeakValue = [expFolder,'_PeakValues']; 
+if ~exist(excelName_RawMean)
+    excelName_RawMean = strcat(studyPath, sheetName_PeakValue, '_', dt,'.xlsx');
+end
+backup_RawMean = strcat(studyPath,sheetName_PeakValue, '_', dt,'.mat');
+
+if ispc || ismac
+    writetable(table_PeakValues, excelName_RawMean, 'Sheet', sheetName_PeakValue);
+    save(backup_RawMean, 'table_PeakValues', '-v7.3') %, '-nocompression'
+elseif isunix
+    save(backup_RawMean, 'table_PeakValues', 'expFolder', '-v7.3') %, '-nocompression'
+else
+    disp('Platform not supported')
+end
+
+disp('Save the peak values into the excel file successfully!');

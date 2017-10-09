@@ -5,4 +5,5 @@ Matlab scripts to analyze ERP data
  Inlcuding: PreProcessing, Creating study, export raw data, amptitude and latency.
  
  V 1.0 scripts are based on the preProcessing steps in Corblab
+ 
  V 2.0 scripts are following the makoto preprocessing pipeline

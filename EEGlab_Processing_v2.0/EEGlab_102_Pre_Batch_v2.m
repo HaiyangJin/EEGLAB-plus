@@ -57,6 +57,8 @@ end
 % ParticipantNum
 if strcmp(experimentNum, '2')
     theParticipants = 0:19; 
+elseif strcmp(experimentNum, '1')
+    theParticipants = 1:21;
 else
     theParticipants = 1:20;
 end
@@ -84,20 +86,16 @@ fopen([outputPath jobID '_' ID '.txt'],'w+'); % create a txt file whose filename
 % get the participant name
 %     participantName = num2str(theParticipants(iParticipant),['P', experimentNum,'%02d']);  %P101
 % filenames to be saved later
-rawFilename = strcat(participantName, '_01_Raw data'); % the name of the raw file
+% rawFilename = strcat(participantName, '_01_Raw data'); % the name of the raw file
 ICAName = strcat(participantName, '_02_ICAed_',dt);
 tempFile = strcat(outputPath, participantName, '_tempFile', roundNum, '.mat');
 
 tempfile_weight = strcat(outputPath, participantName, '_EEGweight.mat');
 
-% check if there are only 1 raw file for this participant
-oneRawFile = strcmp(participantName,'P209') || strcmp(participantName,'P211')...
-    || strcmp(participantName,'P301') || strcmp(participantName,'P304')...
-    || strcmp(participantName,'P311');
 
 %% PREPROCESSING %%
 % high frequency filter for the two rounds data
-highFilter = [1, 0.1];
+% highFilter = [1, 0.1];
 iProcess = str2double(roundNum);
 
 %%%% load the temp1 data
@@ -125,6 +123,13 @@ EEG = pop_select( EEG,'nochannel',{'initialReference'});
 
 if iProcess == 1
     %%%% 110: Run AMICA using calculated data rank with 'pcakeep' option
+    % create a folder to save the tmpdata***
+    tempFolder = [outputPath, participantName, filesep];
+    if ~exist('tempFolder', 'dir')
+        mkdir(tempFolder);
+    end 
+    cd(tempFolder);
+    
     if isfield(EEG.etc, 'clean_channel_mask')
         dataRank = min([rank(double(EEG.data')) sum(EEG.etc.clean_channel_mask)]);
     else

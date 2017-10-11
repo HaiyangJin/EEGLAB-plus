@@ -54,6 +54,8 @@ end
 % ParticipantNum
 if strcmp(experimentNum, '2')
     theParticipants = 0:19; 
+elseif strcmp(experimentNum, '1')
+    theParticipants = 1:21;
 else
     theParticipants = 1:20;
 end
@@ -82,8 +84,8 @@ for iParticipant = 1:numParticipant
     participantName = num2str(theParticipants(iParticipant),['P', experimentNum,'%02d']);  %P101
     % filenames to be saved later
     rawFilename = strcat(participantName, '_01_Raw data'); % the name of the raw file
-    ICAName = strcat(participantName, '_02_ICAed_',dt);
-    ICAWeightName = strcat(participantName, '_ICAWeight_',dt);
+%     ICAName = strcat(participantName, '_02_ICAed_',dt);
+%     ICAWeightName = strcat(participantName, '_ICAWeight_',dt);
     tempFile = strcat(outputPath, participantName, '_tempFile', roundNum, '.mat');
 %     tempfile_weight = scrcat(outputPath, participantName, '_EEGweight.mat');
     

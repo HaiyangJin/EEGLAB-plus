@@ -2,8 +2,8 @@
 #SBATCH -J 110
 #SBATCH -A uoa00424         # Project Account
 #SBATCH --time=24:00:00     # Walltime
-#SBATCH --mem-per-cpu=8G    # memory/cpu 
-#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=10G    # memory/cpu 
+#SBATCH --cpus-per-task=4
 #SBATCH --profile=task
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz

@@ -23,6 +23,10 @@ elseif strcmp(experimentNum, '4')
 end
 numLabel = length(labels); % the number of labels
 
+
+
+
+
 % ParticipantNum
 if strcmp(experimentNum, '2')
     theParticipants = 0:19; 

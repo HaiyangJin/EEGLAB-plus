@@ -60,8 +60,16 @@ end
 %% Preparation 
 % the numbers of all the participant that you want to create the study for
 if strcmp(experimentNum, '2')
-    theParticipants = 0:19; 
-else
+    theParticipants = 0:19;
+elseif strcmp(experimentNum, '1')
+    theParticipants = 1:21;
+elseif strcmp(experimentNum, '3')
+    if strcmp(isBasedACC, '1')
+        theParticipants = [1:8 10:16 18:20];
+    else
+        theParticipants = 1:20;
+    end
+elseif strcmp(experimentNum, '4')
     theParticipants = 1:20;
 end
 numParticipant = length(theParticipants); % the number of participants
@@ -100,6 +108,25 @@ studyName = ['EEG_FH_', expFolder, '_', num2str(numParticipant), '_', ...
 
 % get all the lables for this study
 labels = unique({STUDY.datasetinfo(1).trialinfo.type});
+if isBasedACC  % if the labels are only for correct ones
+    % find the lables end with '1'
+    endLetterLabel = cellfun(@(x) x(end), labels, 'UniformOutput', false);
+    logicEndLabel = strcmp(endLetterLabel,'1');
+    
+    % find the 17ms labels end with '0'
+    letter3Label = cellfun(@(x) x(3), labels, 'UniformOutput', false);
+    logic3Label = strcmp(letter3Label,'7');
+    letter0Label = cellfun(@(x) x(end), labels, 'UniformOutput', false);
+    logic0Label = strcmp(letter0Label,'0');
+    logic30Label = logical(logic3Label .* logic0Label);
+    
+    % find the labels start with S
+    letterSLabel = cellfun(@(x) x(1), labels, 'UniformOutput', false);
+    logicSLabel = strcmp(letterSLabel,'S');
+    
+    logicLabel = logical(logicEndLabel + logic30Label + logicSLabel);
+    labels = labels(logicLabel);
+end
 
 % make the design for this study
 designName = [expFolder, '_', num2str(numParticipant), '_', isManualRejected, '_', isBasedACC];

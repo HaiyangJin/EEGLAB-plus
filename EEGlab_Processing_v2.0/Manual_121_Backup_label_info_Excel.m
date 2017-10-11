@@ -16,7 +16,7 @@ if strcmp(filenames(1), 'P')
     filenameAllLabel = [filepath, experimentName, '_', num2str(numFiles), '_BackupLabelInfo.xlsx'];
     writetable(allLabel_Table, filenameAllLabel);
 else
-    tempFilename = filenames(1);
+    tempFilename = filenames{1};
     load([filePath, tempFilename]);  % load 'labelsBackCell'
     numFiles = length(filenames);
     experimentName = ['20', tempFilename(2)];
@@ -26,14 +26,14 @@ else
     
     for iFile = 1:numFiles
         clear labelsBackCell
-        load([filePath, filenames(iFile)]);  % load 'labelsBackCell'
+        load([filePath, filenames{iFile}]);  % load 'labelsBackCell'
         allLabelBackup(iFile + 1, :) = labelsBackCell(2,:);  % save the label info for this file
     end
     
     % Save the cell as table and save as excel file
     variableNames = cellfun(@(x) [x(1:3), x(5:end)], labelsBackCell(1,:), 'UniformOutput', false); 
     allLabel_Table = cell2table(allLabelBackup(2:end,:), 'VariableNames', variableNames);
-    filenameAllLabel = [filepath, experimentName, '_', num2str(numFiles), '_BackupLabelInfo.xlsx'];
+    filenameAllLabel = [filePath, experimentName, '_', num2str(numFiles), '_BackupLabelInfo.xlsx'];
     writetable(allLabel_Table, filenameAllLabel);
     
 end

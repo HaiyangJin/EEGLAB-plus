@@ -135,6 +135,13 @@ for iProcess = 1:(2-isHighFilter1)
     
     if iProcess == 1
         %%%% 110: Run AMICA using calculated data rank with 'pcakeep' option
+        % create a folder to save the tmpdata***
+        tempFolder = [outputPath, participantName, filesep];
+        if ~exist('tempFolder', 'dir')
+            mkdir(tempFolder);
+        end
+        cd(tempFolder);
+        
         if isfield(EEG.etc, 'clean_channel_mask')
             dataRank = min([rank(double(EEG.data')) sum(EEG.etc.clean_channel_mask)]);
         else

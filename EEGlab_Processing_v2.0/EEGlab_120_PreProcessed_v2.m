@@ -40,10 +40,25 @@ epochEnd = 1;
 %% 100 Preparation %%% changes needed for new user %%%
 % get the ID (string) 
 ID = getenv('SLURM_ARRAY_TASK_ID');  % name of this participant
-participantName = ['P' ID(2:4)];
-experimentNum = ID(2);  % get the experimentNum
+participantName = ['P' ID(3:5)];
+experimentNum = ID(3);  % get the experimentNum
 disp(experimentNum);
-isBasedACC = ID(1); % 1, only save the correct trials. 2, use all trials
+isIndividual = ID(1); % 1, rejected by individual. 2, rejected by group
+switch isIndividual
+    case '1'
+        isIndividualFolder = 'Individual';
+    case '2'
+        isIndividualFolder = 'Group';
+end
+
+isBasedACC = ID(2); % 1, only save the correct trials. 2, use all trials
+switch isBasedACC
+    case '1'
+        isBasedAccFolder = 'Acc';
+    case '2'
+        isBasedAccFolder = 'All';
+end
+
 jobID = getenv('SLURM_ARRAY_JOB_ID'); % get the job ID from Cluster
 
 % Preparation for cluster 
@@ -60,12 +75,12 @@ expFolderPath = [projectPath,expFolder,filesep];  % where the raw data are saved
 %% 00 Preparation for the second part of preprocessing 
 %%%% 00 load the IC Rejected data
 % the filename and path for IC rejected data
-rejectedFolder = '03_Rejected_manual';
+rejectedFolder = ['03_Rejected', isIndividualFolder];
 rejectedName = strcat(participantName, '_', rejectedFolder,'.set');
 rejectedPath = [expFolderPath, rejectedFolder, filesep];
 
 % the filename and path for ALL PreProcessed data
-preProcessedFolder = ['04_PreProcessed_manual_', isBasedACC];
+preProcessedFolder = [isIndividualFolder, '_', isBasedAccFolder];
 preProcessedName = strcat(participantName, '_', preProcessedFolder,'.set');
 preProcessedPath = [expFolderPath, preProcessedFolder, filesep];
 if ~exist('preProceddedPath', 'dir')
@@ -125,7 +140,7 @@ EEG = pop_rmbase( EEG, [epochStart*1000 0]);
 %%%%%%%%%%%%%%%%%%%%%%%%%% work on the labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%  Rename the labels as correct and incorrect  %%%%%%%%%%%%%%%%%
-if strcmp(isBasedACC,'1')
+if strcmp(isBasedAccFolder,'1')
     % save the label ('RES0' and 'RES1') as 'RESP'. And create another
     % filed 'RESP' wihcih show if this trial is correct or incorrect
     EEG = pop_selectevent( EEG, 'type',{'RES0' 'RES1'},'renametype','RESP',...
@@ -211,7 +226,7 @@ disp('Save the preProcessed file successfully!');
 
 %% %% 200 Create ERP study for this participant
 % crete the study only for this participant
-studyName = ['EEG_', participantName,'_manual_',dt]; 
+studyName = ['EEG_', participantName,'_',dt]; 
 numLabel = length(labels);
 
 % create the study design for this participant
@@ -225,7 +240,7 @@ participantTempDesign = {'index' 1 'load' [preProcessedPath, preProcessedName]..
     'commands', participantTempDesign);
 
 % make the design for this participant
-designName = [participantName, '_manual'];
+designName = [participantName, '_', preProcessedFolder];
 STUDY = std_makedesign(STUDY, ALLEEG, 1, 'variable1','type','variable2','',...
     'name', designName,'pairing1','on','pairing2','on','delfiles','off',...
     'defaultdesign','off','values1',labels, 'subjselect', {participantName});

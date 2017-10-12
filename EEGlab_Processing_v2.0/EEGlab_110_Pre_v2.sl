@@ -7,6 +7,6 @@
 #SBATCH --profile=task
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --array=402    # Array definition 101-121 200-219 301-320 401
+#SBATCH --array=403,404    # Array definition 101-121 200-219 301-320 401-420
 module load MATLAB/2016b
 srun matlab -nodesktop -nosplash -r EEGlab_110_Pre_v2 $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

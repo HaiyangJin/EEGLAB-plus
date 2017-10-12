@@ -112,14 +112,14 @@ disp(goodICs);
 % rename the files
 if strcmp(ICRejectedFilenames(1), 'P') % if there is only one file
     oldFile = [ICRejectedPath, ICRejectedFilenames];
-    newFile = [ICRejectedPath, ICRejectedFilenames(1:6), '3_Rejected_manual', ICRejectedFilenames(end-3:end)]; 
+    newFile = [ICRejectedPath, ICRejectedFilenames(1:6), '3_Rejected_Group', ICRejectedFilenames(end-3:end)]; 
     movefile(oldFile, newFile); % rename this file as PreProcessed file
 else
     numFiles = length(ICRejectedFilenames);
     for iFile = 1:numFiles
         thisFilename = ICRejectedFilenames{iFile};
         oldFile = [ICRejectedPath, thisFilename];
-        newFile = [ICRejectedPath, thisFilename(1:6), '3_Rejected_manual', thisFilename(end-3:end)];
+        newFile = [ICRejectedPath, thisFilename(1:6), '3_Rejected_Group', thisFilename(end-3:end)];
         movefile(oldFile, newFile);
     end
 end

@@ -10,19 +10,18 @@
 
 
 %% % Prepaparation for different platform
-manual_auto = {'manual', 'auto'};
-baselineStart = -100;
+baselineStart = -200;
 if isunix
     % get the experiment number
     ID = getenv('SLURM_ARRAY_TASK_ID');
     display(ID);
     % to make sure the length of ID is two
-    if length(ID) ~= 3
-        error('There should be three digitals for the array!!!')
+    if length(ID) ~= 5
+        error('There should be five digitals for the array!!!')
     else
-        experimentNum = ID(1);    % the number of experiment
-        isManualRejected = manual_auto{2-str2double(ID(2))}; % if the ICs were rejected manually
-        isBasedACC = ID(3);  % if this process is only for the correct trials
+        experimentNum = ID(3);    % the number of experiment
+        isIndividual = ID(1); % 1, rejected by individual. 2, rejected by group
+        isBasedAcc = ID(2);  % if this process is only for the correct trials
     end
   
     % get the Job ID from Cluster
@@ -34,26 +33,47 @@ if isunix
     projectPath = '/gpfs1m/projects/uoa00424/'; % the path for this project
     expFolder = ['20' experimentNum];  % the folder for this experiment
     expFolderPath = [projectPath,expFolder,filesep];  % the path for this experiment
-    studyPath = [expFolderPath,'04_PreProcessed_',isManualRejected, '_', isBasedACC,filesep]; % get the study path
-    fopen([studyPath jobID '_' ID '.txt'],'w+'); % create a txt file whose filename is the job ID
     
 elseif ispc
     % input the number of this experiment
-    experimentNum = input('Please input the experiment Number (1, 2, 3, or 4).', 's');
-    expFolder = ['20' experimentNum];
-    isManual = input('Are the ICs rejected manually? (0,1)');
-    isManualRejected = manual_auto{2-isManual};
-    isBasedACC = input('Are the epochs basded on ACC? (1(yes), 2(no))?', 's');
-    
-    % open GUI to select the folder where the PreProcessed data are saved
-    studyPath = [uigetdir('C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis',...
-        'Please choose the folder where the clean (PreProcessed) data are saved.'), filesep];
-    
+    while isempty(experimentNum) || isempty(isIndividual) || isempty(isBasedAcc) 
+        experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ', 's');
+        expFolder = ['20' experimentNum];
+        isIndividual = input('Are the ICs rejected individually (1(individually), 2(group)): ');
+        isBasedAcc = input('Are the epochs basded on ACC? (1(yes), 2(no))? ', 's');
+    end
 elseif ismac
     % this script doesn't work on Mac since no data could be accessed
     error('There are no data saved on Mac.');
 else
     error('Platform not supported!');
+end
+
+% get the folder info
+switch isIndividual
+    case '1'
+        isIndividualFolder = 'Individual';
+    case '2'
+        isIndividualFolder = 'Group';
+end
+
+switch isBasedAcc
+    case '1'
+        isBasedAccFolder = 'Acc';
+    case '2'
+        isBasedAccFolder = 'All';
+end
+folderInfo = [isIndividualFolder, '_', isBasedAccFolder];
+
+% get the study path
+if isunix
+    studyPath = [expFolderPath,'04_PreProcessed_', folderInfo, filesep]; % get the study path
+    fopen([studyPath jobID '_' ID '.txt'],'w+'); % create a txt file whose filename is the job ID
+    
+elseif ispc
+    % open GUI to select the folder where the PreProcessed data are saved
+    studyPath = [uigetdir('C:\Users\hjin317\Google Drive\2_EEG_DataAnalysis',...
+        'Please choose the folder where the clean (PreProcessed) data are saved.'), filesep];
 end
 
 
@@ -64,7 +84,7 @@ if strcmp(experimentNum, '2')
 elseif strcmp(experimentNum, '1')
     theParticipants = 1:21;
 elseif strcmp(experimentNum, '3')
-    if strcmp(isBasedACC, '1')
+    if strcmp(isBasedAcc, '1')
         theParticipants = [1:8 10:16 18:20];
     else
         theParticipants = 1:20;
@@ -82,7 +102,7 @@ clear participantList
 tempStudyDesign = cell(1, numParticipant);
 participantList = cell(1, numParticipant);
 
-preProcessedName = ['_04_PreProcessed_', isManualRejected, '_', isBasedACC];
+preProcessedName = ['_04_PreProcessed_', isIndividualFolder, '_', isBasedAccFolder];
 
 for iParticipant = 1:numParticipant
     tempParticipant = num2str(theParticipants(iParticipant),['P' experimentNum '%02d']);
@@ -102,13 +122,13 @@ end
 [ALLEEG] = eeglab;
 dt = datestr(now,'yymmddHH');
 studyName = ['EEG_FH_', expFolder, '_', num2str(numParticipant), '_', ...
-    isManualRejected, '_', isBasedACC, '_' dt];
+    folderInfo, '_' dt];
 [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, 'name', studyName, 'updatedat','off',...
     'commands', tempStudyDesign);
 
 % get all the lables for this study
 labels = unique({STUDY.datasetinfo(1).trialinfo.type});
-if isBasedACC  % if the labels are only for correct ones
+if isBasedAcc  % if the labels are only for correct ones
     % find the lables end with '1'
     endLetterLabel = cellfun(@(x) x(end), labels, 'UniformOutput', false);
     logicEndLabel = strcmp(endLetterLabel,'1');
@@ -129,7 +149,7 @@ if isBasedACC  % if the labels are only for correct ones
 end
 
 % make the design for this study
-designName = [expFolder, '_', num2str(numParticipant), '_', isManualRejected, '_', isBasedACC];
+designName = [expFolder, '_', num2str(numParticipant), '_', folderInfo];
 STUDY = std_makedesign(STUDY, ALLEEG, 1, 'variable1','type','variable2','',...
     'name', designName,'pairing1','on','pairing2','on','delfiles','off',...
     'defaultdesign','off','values1',labels, 'subjselect', participantList);
@@ -243,7 +263,7 @@ if ~exist('dt', 'var')
 end
 
 sheetName_MeanRaw = [expFolder,'_MeanRaw']; 
-rawMeanName = strcat(studyPath, sheetName_MeanRaw, '_', isManualRejected, '_', isBasedACC, '_', dt);
+rawMeanName = strcat(studyPath, sheetName_MeanRaw, '_', folderInfo, '_', dt);
 excelName_RawMean = strcat(rawMeanName, '.xlsx');
 backup_RawMean = strcat(rawMeanName, '.mat');
 
@@ -391,7 +411,7 @@ if ~exist('dt', 'var')
 end
 sheetName_LockWindow = 'LockWindow'; 
 sheetName_GrandAver = 'GrandAver';
-lockWindowName = strcat(studyPath, expFolder, '_LockingWindow_', isManualRejected, '_', isBasedACC, '_', dt);
+lockWindowName = strcat(studyPath, expFolder, '_LockingWindow_', folderInfo, '_', dt);
 excelName_LockWindow = strcat(lockWindowName, '.xlsx');
 backup_LockWindow = strcat(lockWindowName, '.mat');
 
@@ -468,7 +488,7 @@ if ~exist('dt', 'var')
     dt = datestr(now,'yymmddHH');
 end
 sheetName_Topo = 'TopoCheck'; 
-topoCheck = strcat(studyPath, expFolder, '_TopoData_', isManualRejected, '_', isBasedACC, '_', dt);
+topoCheck = strcat(studyPath, expFolder, '_TopoData_', folderInfo, '_', dt);
 excelName_TopoCheck = strcat(topoCheck, '.xlsx');
 backup_TopoCheck = strcat(topoCheck, '.mat');
 

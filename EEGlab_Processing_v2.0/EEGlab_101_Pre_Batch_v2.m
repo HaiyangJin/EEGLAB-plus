@@ -116,8 +116,8 @@ for iParticipant = 1:numParticipant
         rawName = [participantName, '001.RAW'];
         EEG = pop_readsegegi([expFolderPath, rawName]); %'C:\EEG data\202_EEG&Mask\P021\P021001.RAW')
     end
-    [~, EEG] = pop_newset(ALLEEG, EEG, 1,'setname',rawFilename,'gui','off');
-    EEG = pop_saveset(EEG, 'filename',rawFilename,'filepath',expFolderPath); % save the raw data as backup
+%     [~, EEG] = pop_newset(ALLEEG, EEG, 1,'setname',rawFilename,'gui','off');
+%     EEG = pop_saveset(EEG, 'filename',rawFilename,'filepath',expFolderPath); % save the raw data as backup
     
     %%%% 102 Change time point
     EEG = correctTriggerLatency(EEG,50);

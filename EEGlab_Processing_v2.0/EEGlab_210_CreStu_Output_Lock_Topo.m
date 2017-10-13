@@ -16,14 +16,27 @@ if isunix
     ID = getenv('SLURM_ARRAY_TASK_ID');
     display(ID);
     % to make sure the length of ID is two
-    if length(ID) ~= 5
-        error('There should be five digitals for the array!!!')
+    if length(ID) ~= 4
+        error('There should be four digitals for the array!!!')
     else
-        experimentNum = ID(3);    % the number of experiment
-        isIndividual = ID(1); % 1, rejected by individual. 2, rejected by group
-        isBasedAcc = ID(2);  % if this process is only for the correct trials
+        experimentNum = ID(2);    % the number of experiment
+        folderInfoNum = ID(1);
+        switch folderInfoNum
+            case '1'
+                isIndividual = 2;
+                isBasedAcc = 1;
+            case '2'
+                isIndividual = 1;
+                isBasedAcc = 1;
+            case '3'
+                isIndividual = 1;
+                isBasedAcc = 2;
+            case '4'
+                isIndividual = 2;
+                isBasedAcc = 2;
+        end
     end
-  
+    
     % get the Job ID from Cluster
     jobID = getenv('SLURM_ARRAY_JOB_ID');
     
@@ -37,10 +50,10 @@ if isunix
 elseif ispc
     % input the number of this experiment
     while isempty(experimentNum) || isempty(isIndividual) || isempty(isBasedAcc) 
-        experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ', 's');
+        experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ');
         expFolder = ['20' experimentNum];
         isIndividual = input('Are the ICs rejected individually (1(individually), 2(group)): ');
-        isBasedAcc = input('Are the epochs basded on ACC? (1(yes), 2(no))? ', 's');
+        isBasedAcc = input('Are the epochs basded on ACC? (1(yes), 2(no))?  ');
     end
 elseif ismac
     % this script doesn't work on Mac since no data could be accessed
@@ -50,19 +63,12 @@ else
 end
 
 % get the folder info
-switch isIndividual
-    case '1'
-        isIndividualFolder = 'Individual';
-    case '2'
-        isIndividualFolder = 'Group';
-end
+indiInfoFolder = {'Individual', 'Group'};
+isIndividualFolder = indiInfoFolder{isIndividual};
 
-switch isBasedAcc
-    case '1'
-        isBasedAccFolder = 'Acc';
-    case '2'
-        isBasedAccFolder = 'All';
-end
+accInfoFolder = {'Acc', 'All'};
+isBasedAccFolder = accInfoFolder{isBasedAcc};
+
 folderInfo = [isIndividualFolder, '_', isBasedAccFolder];
 
 % get the study path
@@ -316,6 +322,20 @@ table_GrandAver(rowNumGrandAver,1:coluNumGrandAver) = rowGrand;
 table_GrandAver.Properties.VariableNames = table_LockWindow.Properties.VariableNames;
 table_LockWindow = vertcat(table_LockWindow, rowGrand); % save the mean data to lock window table
 
+% save the data into excel or backup the data in cluster
+if ~exist('dt', 'var')
+    dt = datestr(now,'yymmddHH');
+end
+sheetName_LockWindow = 'LockWindow'; 
+backup_LockWindow = strcat(lockWindowName, '.mat');
+sheetName_GrandAver = 'GrandAver';
+lockWindowName = strcat(studyPath, expFolder, '_LockingWindow_', folderInfo, '_', dt);
+excelName_LockWindow = strcat(lockWindowName, '.xlsx');
+if ispc || ismac
+    writetable(table_GrandAver, excelName_LockWindow, 'Sheet', sheetName_GrandAver);
+end
+save(backup_LockWindow, 'table_GrandAver', 'STUDY', 'ALLEEG', 'expFolder', '-v7.3') %, '-nocompression'
+
 
 %% calculate the time windows
 % find the time points where the values changes from positive to 
@@ -405,16 +425,6 @@ for iTime_N1 = tempN1_Start:tempN1_End
     end 
 end
 
-% save the data into excel or backup the data in cluster
-if ~exist('dt', 'var')
-    dt = datestr(now,'yymmddHH');
-end
-sheetName_LockWindow = 'LockWindow'; 
-sheetName_GrandAver = 'GrandAver';
-lockWindowName = strcat(studyPath, expFolder, '_LockingWindow_', folderInfo, '_', dt);
-excelName_LockWindow = strcat(lockWindowName, '.xlsx');
-backup_LockWindow = strcat(lockWindowName, '.mat');
-
 % create a table to contain the info about time windows and save in the
 % excel
 timePointPeak = {timePeakP1 + tempP1_Start - 1; timePeakN1 + tempN1_Start - 1};
@@ -428,7 +438,6 @@ table_TimeWindow = table(timePointPeak, windowStartFrame, windowEndFrame,...
 
 if ispc || ismac
     writetable(table_LockWindow, excelName_LockWindow, 'Sheet', sheetName_LockWindow);
-    writetable(table_GrandAver, excelName_LockWindow, 'Sheet', sheetName_GrandAver);
     writetable(table_TimeWindow, excelName_LockWindow, 'WriteRowNames', true,...
         'Sheet', sheetName_GrandAver, 'Range', 'B5');
     save(backup_LockWindow, 'table_LockWindow', 'table_GrandAver', 'table_TimeWindow',...

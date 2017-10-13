@@ -40,24 +40,31 @@ epochEnd = 1;
 %% 100 Preparation %%% changes needed for new user %%%
 % get the ID (string) 
 ID = getenv('SLURM_ARRAY_TASK_ID');  % name of this participant
-participantName = ['P' ID(3:5)];
-experimentNum = ID(3);  % get the experimentNum
+participantName = ['P' ID(2:4)];
+experimentNum = ID(2);  % get the experimentNum
 disp(experimentNum);
-isIndividual = ID(1); % 1, rejected by individual. 2, rejected by group
-switch isIndividual
+
+folderInfoNum = ID(1);
+switch folderInfoNum
     case '1'
-        isIndividualFolder = 'Individual';
+        isIndividual = 2;
+        isBasedAcc = 1;
     case '2'
-        isIndividualFolder = 'Group';
+        isIndividual = 1;
+        isBasedAcc = 1;
+    case '3'
+        isIndividual = 1;
+        isBasedAcc = 2;
+    case '4'
+        isIndividual = 2;
+        isBasedAcc = 2;
 end
 
-isBasedACC = ID(2); % 1, only save the correct trials. 2, use all trials
-switch isBasedACC
-    case '1'
-        isBasedAccFolder = 'Acc';
-    case '2'
-        isBasedAccFolder = 'All';
-end
+indiInfoFolder = {'Individual', 'Group'};
+isIndividualFolder = indiInfoFolder{isIndividual};
+
+accInfoFolder = {'Acc', 'All'};
+isBasedAccFolder = accInfoFolder{isBasedAcc};
 
 jobID = getenv('SLURM_ARRAY_JOB_ID'); % get the job ID from Cluster
 

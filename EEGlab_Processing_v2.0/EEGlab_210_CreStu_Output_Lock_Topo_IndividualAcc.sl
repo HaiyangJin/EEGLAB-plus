@@ -6,6 +6,6 @@
 #SBATCH --cpus-per-task=2 
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --array=11100    # Array definition (11100,11200,11300,11400 Individual(1),acc(1),experimentNum(1234),00)
+#SBATCH --array=2100    # Array definition (2100,2200,2300,2400 [2]Individual(1),acc(1),experimentNum(1234),00)
 module load MATLAB/2016b
 srun matlab -nodesktop -nosplash -r EEGlab_210_CreStu_Output_Lock_Topo $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

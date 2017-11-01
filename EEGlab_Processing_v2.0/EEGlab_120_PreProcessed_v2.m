@@ -82,14 +82,14 @@ expFolderPath = [projectPath,expFolder,filesep];  % where the raw data are saved
 %% 00 Preparation for the second part of preprocessing 
 %%%% 00 load the IC Rejected data
 % the filename and path for IC rejected data
-rejectedFolder = ['03_Rejected', isIndividualFolder];
+rejectedFolder = ['03_Rejected_', isIndividualFolder];
 rejectedName = strcat(participantName, '_', rejectedFolder,'.set');
 rejectedPath = [expFolderPath, rejectedFolder, filesep];
 
 % the filename and path for ALL PreProcessed data
 preProcessedFolder = [isIndividualFolder, '_', isBasedAccFolder];
-preProcessedName = strcat(participantName, '_', preProcessedFolder,'.set');
-preProcessedPath = [expFolderPath, preProcessedFolder, filesep];
+preProcessedName = strcat(participantName, '_04_PreProcessed_',preProcessedFolder,'.set');
+preProcessedPath = [expFolderPath, '04_PreProcessed_', preProcessedFolder, filesep];
 if ~exist('preProceddedPath', 'dir')
     mkdir(preProcessedPath);
 end
@@ -147,7 +147,7 @@ EEG = pop_rmbase( EEG, [epochStart*1000 0]);
 %%%%%%%%%%%%%%%%%%%%%%%%%% work on the labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%  Rename the labels as correct and incorrect  %%%%%%%%%%%%%%%%%
-if strcmp(isBasedAccFolder,'1')
+if strcmp(isBasedAccFolder,'Acc')
     % save the label ('RES0' and 'RES1') as 'RESP'. And create another
     % filed 'RESP' wihcih show if this trial is correct or incorrect
     EEG = pop_selectevent( EEG, 'type',{'RES0' 'RES1'},'renametype','RESP',...

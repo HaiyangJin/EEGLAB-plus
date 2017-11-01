@@ -100,7 +100,7 @@ disp(['Save the study for ', num2str(numParticipant), ' participant successfully
 %% input info
 % for mean of raw data
 studyName4Cluster = ' ';
-if ~exist('experimentNum')
+if ~exist('experimentNum', 'var')
     experimentNum = '1';   % the number of experiment
 end
 % theParticipant = [0:19]; % input all participant names  :13 15 

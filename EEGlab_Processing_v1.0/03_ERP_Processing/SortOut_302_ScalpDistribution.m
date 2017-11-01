@@ -3,7 +3,7 @@
 [fileNames, saveDir] = uigetfile('*.mat', 'Please choose the ''.mat'' file contains the raw mean (topo) data for topography.');
 load([saveDir,fileNames]); % load the raw data
 
-numLabel = size(table_TopoData,2);
+numLabels = size(table_TopoData,2);
 numPotential = size(table_TopoData,1);
 
 %% show the figure (loop)
@@ -17,7 +17,7 @@ numPotential = size(table_TopoData,1);
 % end
 
 for iPotential = 1:numPotential
-    for iLabel = 1:numLabel
+    for iLabel = 1:numLabels
         
         % Name of the figure
         namePart1 = table_TopoData.Properties.RowNames{iPotential,1};

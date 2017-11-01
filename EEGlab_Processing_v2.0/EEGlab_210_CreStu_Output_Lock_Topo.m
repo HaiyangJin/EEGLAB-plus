@@ -49,12 +49,22 @@ if isunix
     
 elseif ispc
     % input the number of this experiment
-    while isempty(experimentNum) || isempty(isIndividual) || isempty(isBasedAcc) 
-        experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ');
-        expFolder = ['20' experimentNum];
+    experimentNum = [];
+    while isempty(experimentNum)
+        experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ','s');
+    end
+    expFolder = ['20' experimentNum];
+    
+    isIndividual = [];
+    while isempty(isIndividual)
         isIndividual = input('Are the ICs rejected individually (1(individually), 2(group)): ');
+    end
+    
+    isBasedAcc = [];
+    while isempty(isBasedAcc)
         isBasedAcc = input('Are the epochs basded on ACC? (1(yes), 2(no))?  ');
     end
+    
 elseif ismac
     % this script doesn't work on Mac since no data could be accessed
     error('There are no data saved on Mac.');
@@ -90,7 +100,7 @@ if strcmp(experimentNum, '2')
 elseif strcmp(experimentNum, '1')
     theParticipants = 1:21;
 elseif strcmp(experimentNum, '3')
-    if strcmp(isBasedAcc, '1')
+    if isBasedAcc == 1
         theParticipants = [1:8 10:16 18:20];
     else
         theParticipants = 1:20;
@@ -134,17 +144,21 @@ studyName = ['EEG_FH_', expFolder, '_', num2str(numParticipant), '_', ...
 
 % get all the lables for this study
 labels = unique({STUDY.datasetinfo(1).trialinfo.type});
-if isBasedAcc  % if the labels are only for correct ones
+if isBasedAcc == 1 % if the labels are only for correct ones
     % find the lables end with '1'
     endLetterLabel = cellfun(@(x) x(end), labels, 'UniformOutput', false);
     logicEndLabel = strcmp(endLetterLabel,'1');
     
-    % find the 17ms labels end with '0'
-    letter3Label = cellfun(@(x) x(3), labels, 'UniformOutput', false);
-    logic3Label = strcmp(letter3Label,'7');
-    letter0Label = cellfun(@(x) x(end), labels, 'UniformOutput', false);
-    logic0Label = strcmp(letter0Label,'0');
-    logic30Label = logical(logic3Label .* logic0Label);
+    if strcmp(experimentNum, '3')
+        % find the 17ms labels end with '0'
+        letter3Label = cellfun(@(x) x(3), labels, 'UniformOutput', false);
+        logic3Label = strcmp(letter3Label,'7');
+        letter0Label = cellfun(@(x) x(end), labels, 'UniformOutput', false);
+        logic0Label = strcmp(letter0Label,'0');
+        logic30Label = logical(logic3Label .* logic0Label);
+    else
+        logic30Label = 0;
+    end
     
     % find the labels start with S
     letterSLabel = cellfun(@(x) x(1), labels, 'UniformOutput', false);
@@ -181,9 +195,10 @@ disp(['Save the study of ', studyName, ' successfully!']);
 % Preparation
 elecAll = {STUDY.changrp.channels};  % all the electrodes in this exp
 numElecAll = length(elecAll); % number of electrodes
-labels = STUDY.design.variable(1).value;  % get the label names
+% labels = STUDY.design.variable(1).value;  % get the label names
 numLabels = length(labels); % number of labels
-participantNames = cellstr(STUDY.subject); % cell array contains all the participant names
+% participantNames = cellstr(STUDY.subject); % cell array contains all the participant names
+participantNames = participantList';
 
 % info about epoch start and end point
 epochStart = EEG(1).xmin*1000; % -200;
@@ -327,9 +342,9 @@ if ~exist('dt', 'var')
     dt = datestr(now,'yymmddHH');
 end
 sheetName_LockWindow = 'LockWindow'; 
-backup_LockWindow = strcat(lockWindowName, '.mat');
 sheetName_GrandAver = 'GrandAver';
 lockWindowName = strcat(studyPath, expFolder, '_LockingWindow_', folderInfo, '_', dt);
+backup_LockWindow = strcat(lockWindowName, '.mat');
 excelName_LockWindow = strcat(lockWindowName, '.xlsx');
 if ispc || ismac
     writetable(table_GrandAver, excelName_LockWindow, 'Sheet', sheetName_GrandAver);
@@ -340,7 +355,7 @@ save(backup_LockWindow, 'table_GrandAver', 'STUDY', 'ALLEEG', 'expFolder', '-v7.
 %% calculate the time windows
 % find the time points where the values changes from positive to 
 % negative or vice vera between 50 and 220
-P1Start_Assumed = 0;  % assumed start time point for P1
+P1Start_Assumed = 1;  % assumed start time point for P1
 P1End_Assumed = round(72/lag);  % assumed end time point for P1 and the start time point for N1
 N1end_Assumed = round(220/lag);   % assumed end time point for N1
 ratioPeak = 1/2;     % the ratio of peak value. (PEAK VALUE * Ratio) would be used to lock the time window
@@ -366,7 +381,14 @@ for iTime = P1Start_Assumed:N1end_Assumed
         elseif tempPotential1 > 0 && tempPotential2 < 0 % from positive to negative
             switch nZero
                 case 1
-                    nZero = 0;  
+                    if iTime < round(110/lag)
+                        nZero = 0;
+                    else
+                        tempP1_Start = P1Start_Assumed;
+                        tempP1_End = iTime;
+                        tempN1_Start = iTime + 1;
+                        nZero = 2;
+                    end
 %                     error('The first value changes from positive to negative! Please check the grand average data manually.');
                 case 2
                     if iTime > P1End_Assumed 
@@ -458,6 +480,7 @@ if ~exist('elecAll', 'var')
 end
 numElecAll = length(elecAll);
 
+table_TopoData = table; % create the table
 table_GrandTopoCheck = table; % create the table for the data of scalp distribution
 
 for iTimeWindow = 1:length(timeWindowRowNames)
@@ -471,17 +494,37 @@ for iTimeWindow = 1:length(timeWindowRowNames)
     startColuNum = find(strcmp(table_MeanRaw.Properties.VariableNames, startColuName));
     endColuNum = find(strcmp(table_MeanRaw.Properties.VariableNames, endColuName));
     
+    % save the data for ploting topo graph for each label (condition)
+    for iLabel = 1:numLabels
+        thisLabel = labels{1,iLabel};
+        
+        tempTopoData = zeros(1,numElecAll);
+        
+        for iElec = 1:numElecAll
+            thisElec = elecAll{1,iElec};
+            
+            logicTempRows = logical(strcmp(table_MeanRaw{:, 'label'}, thisLabel) .* ...
+                strcmp(table_MeanRaw{:,'electrode'}, thisElec));
+            tempRawData = table_MeanRaw{logicTempRows, startColuNum:endColuNum};
+            
+            % tempTopoData for this time widnow and label
+            tempTopoData(1,iElec) = mean(mean(tempRawData));
+        end
+        
+        table_TopoData(iTimeWindow,iLabel) = {tempTopoData};
+    end
+    
+    % save the data for plotting grand topo graph
     tempTopoData = zeros(1,numElecAll);  % create a zeros array
-
     for iElec = 1:numElecAll
         thisElec = elecAll{1,iElec};  % this electrode
         
         % rows for the temp raw data
-        logicTempRows = strcmp(table_MeanRaw{:,'electrode'}, thisElec);
+        logicGrandRows = strcmp(table_MeanRaw{:,'electrode'}, thisElec);
         
         % select the data of all participants and all labels for this electrode
         % and this time window
-        tempRawData = table_MeanRaw{logicTempRows, startColuNum:endColuNum};
+        tempRawData = table_MeanRaw{logicGrandRows, startColuNum:endColuNum};
         
         % calculate and save the mean of data for this time window and this
         % electrode
@@ -496,32 +539,74 @@ end
 if ~exist('dt', 'var')
     dt = datestr(now,'yymmddHH');
 end
-sheetName_Topo = 'TopoCheck'; 
+sheetName_GrandTopo = 'GrandTopoCheck'; 
+sheetName_TopoLabel = 'TopoLabel';
 topoCheck = strcat(studyPath, expFolder, '_TopoData_', folderInfo, '_', dt);
 excelName_TopoCheck = strcat(topoCheck, '.xlsx');
 backup_TopoCheck = strcat(topoCheck, '.mat');
 
 % create a table to contain the info about topo for checking
 table_GrandTopoCheck.Properties.VariableNames = timeWindowRowNames;
+if isBasedAcc == 1
+    table_TopoData.Properties.VariableNames = cellfun(@(x) [x(1:3), x(6:end)],...
+    labels, 'UniformOutput', false); 
+else 
+    table_TopoData.Properties.VariableNames = cellfun(@(x) [x(1:3)],...
+    labels, 'UniformOutput', false); 
+end
+table_TopoData.Properties.RowNames = timeWindowRowNames;
 
 if ispc || ismac
-    writetable(table_GrandTopoCheck, excelName_TopoCheck, 'Sheet', sheetName_Topo);
-    save(backup_TopoCheck, 'table_GrandTopoCheck', 'STUDY', 'ALLEEG', 'expFolder',...
-        '-v7.3') %, '-nocompression'
+    writetable(table_GrandTopoCheck, excelName_TopoCheck, 'Sheet', sheetName_GrandTopo);
+    writetable(table_TopoData, excelName_TopoCheck, 'Sheet', sheetName_TopoLabel);
+    save(backup_TopoCheck, 'table_GrandTopoCheck', 'table_TopoData', 'STUDY', 'ALLEEG', ...
+        'expFolder', '-v7.3') %, '-nocompression'
 elseif isunix
-    save(backup_TopoCheck, 'table_GrandTopoCheck', 'STUDY', 'ALLEEG', 'expFolder',...
-        '-v7.3') %, '-nocompression'
+    save(backup_TopoCheck, 'table_GrandTopoCheck', 'table_TopoData', 'STUDY', 'ALLEEG', ...
+        'expFolder', '-v7.3') %, '-nocompression'
 else
     error('Platform not supported');
 end
 
-% save the grand topo map as pdf
+figureSize = [200, 300, 900, 750];
 
+% save topo for each label (condition)
+for iPotential = 1:size(table_TopoData,1)
+    for iLabel = 1:numLabels
+        
+        % Name of the figure
+        namePart1 = table_TopoData.Properties.RowNames{iPotential,1};
+        namePart2 = table_TopoData.Properties.VariableNames{1,iLabel};
+        figureName = [namePart1, '-', namePart2];
+        fileName = [expFolder, '-',figureName];
+        
+        % get the data for this potential and this label
+        topoData = table_TopoData{iPotential,iLabel};
+        
+        topoFig = figure('Name',figureName);
+        topoplot(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
+            ...   % set the maximum and minimum value for all the value 'maplimits', [-4 5],
+            'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
+
+        colorbar; % show the color bar
+        title(['\fontsize{20}', figureName]);
+        % topoFig.Color = 'none';  % set the background color as transparent.
+        topoFig.Position = figureSize; % resize the window for this figure
+%         set(gcf, 'Position', [200, 200, 900, 750]) 
+        
+        % print the figure as pdf file
+        figurePDFName = [studyPath, fileName];
+        print(figurePDFName, '-dpdf');
+    end
+end
+
+
+% save the grand topo map as pdf
 for iPotential = 1:size(table_GrandTopoCheck,2)
     
     % Name of the figure
     namePotential = table_GrandTopoCheck.Properties.VariableNames{1,iPotential};
-    topoFigureName = [namePotential, '-GrandTopo']; 
+    topoFigureName = [namePotential, '-GrandTopo-cluster']; 
     topoFileName = [expFolder, '-',topoFigureName];
     
     % get the data for this potential and this label
@@ -535,7 +620,7 @@ for iPotential = 1:size(table_GrandTopoCheck,2)
     colorbar; % show the color bar
     title(['\fontsize{20}', topoFigureName]);
     % topoFig.Color = 'none';  % set the background color as transparent.
-    topoFig.Position = [200, 300, 900, 750]; % resize the window for this figure
+    topoFig.Position = figureSize; % resize the window for this figure
     %         set(gcf, 'Position', [200, 200, 900, 750])
     
     % print the figure as pdf file

@@ -3,6 +3,8 @@
 [fileNames, saveDir] = uigetfile('*.mat', 'Please choose the ''.mat'' file contains the raw mean (topo) data for topography.');
 load([saveDir,fileNames]); % load the raw data
 
+numLabels = size(table_TopoData,2);
+numPotential = size(table_TopoData,1);
 
 %% show the figure (loop)
 % iPotential = [];
@@ -14,22 +16,22 @@ load([saveDir,fileNames]); % load the raw data
 %     iLabel = input('Please enter the label number for the topography:');
 % end
 
-for iPotential = 1:size(table_GrandTopoCheck,2)
-    for iLabel = 1:numLabel
+for iPotential = 1:numPotential
+    for iLabel = 1:numLabels
         
         % Name of the figure
-%         namePart1 = table_GrandTopoCheck.Properties.RowNames{iLabel,1};
-        namePart2 = table_GrandTopoCheck.Properties.VariableNames{1,iPotential};
-        figureName = [namePart2];  % namePart1, '-', 
+        namePart1 = table_TopoData.Properties.RowNames{iPotential,1};
+        namePart2 = table_TopoData.Properties.VariableNames{1,iLabel};
+        figureName = [namePart1, '-', namePart2];
         fileName = [expFolder, '-',figureName];
         
         % get the data for this potential and this label
-        GrandTopoData = table_GrandTopoCheck{iLabel, iPotential};
+        topoData = table_TopoData{iPotential,iLabel};
         
         topoFig = figure('Name',figureName);
-        topoplot(GrandTopoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
-            ...   % set the maximum and minimum value for all the value    'maplimits', [-4 5],
-            'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
+        topoplot(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
+            'maplimits', [-4 5]);   % set the maximum and minimum value for all the value
+%             'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
 
         colorbar; % show the color bar
         title(['\fontsize{20}', figureName]);
@@ -55,15 +57,15 @@ end
 % end
 % 
 % % Name of the figure
-% namePart1 = table_GrandTopoCheck.Properties.RowNames{iPotential,1};
-% namePart2 = table_GrandTopoCheck.Properties.VariableNames{1,iLabel};
+% namePart1 = table_TopoData.Properties.RowNames{iPotential,1};
+% namePart2 = table_TopoData.Properties.VariableNames{1,iLabel};
 % figureName = [expFolder, '-', namePart1, '-', namePart2];
 % 
 % % get the data for this potential and this label
-% GrandTopoData = table_GrandTopoCheck{iPotential,iLabel};
+% topoData = table_TopoData{iPotential,iLabel};
 % 
 % topoFig = figure('Name',figureName);
-% topoplot_EEGlab(GrandTopoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
+% topoplot_EEGlab(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
 %     'maplimits', [-4 5],...   % set the maximum and minimum value for all the value
 %     'electrodes', 'labels'... % show the name of the labels on their locations
 %     ); 

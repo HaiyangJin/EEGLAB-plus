@@ -148,6 +148,8 @@ for iPotential = 1:length(potentials)
     % sheet name and save the table data into excel
     sheetNameRaw = [expFolder, '_', thisPotentialName, '_ClusterRaw'];
     writetable(clusterTable, clusterFileName, 'Sheet', sheetNameRaw);
+    csvFilename = [saveDir, sheetNameRaw, '.csv'];
+    writetable(clusterTable, csvFilename);
     
     disp(['Save the mean data of ', thisPotentialName, ' into the excel successfully!']);
     
@@ -215,6 +217,8 @@ for iPotential = 1:length(potentials)
     % the sheet name and save the peak value data
     sheetNameRaw = [expFolder, '_', thisPotentialName, '_ClusterPeak'];
     writetable(clusterPeakTable, clusterFileName, 'Sheet', sheetNameRaw);
+    csvFilename = [saveDir, sheetNameRaw, '.csv'];
+    writetable(clusterTable, csvFilename);
     
     disp(['Save the peak values ', thisPotentialName, ' into the excel file successfully!']);
     

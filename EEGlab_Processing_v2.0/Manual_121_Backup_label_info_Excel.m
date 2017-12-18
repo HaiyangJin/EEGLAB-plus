@@ -36,7 +36,10 @@ else
     % Save the cell as table and save as excel file
     variableNames = cellfun(@(x) [x(1:3), x(5:end)], labelsBackCell(1,:), 'UniformOutput', false); 
     allLabel_Table = cell2table(allLabelBackup(2:end,:), 'VariableNames', horzcat({'PariticpantNum'}, variableNames));
-    filenameAllLabel = [filePath, experimentName, '_', num2str(numFiles), '_BackupLabelInfo.xlsx'];
-    writetable(allLabel_Table, filenameAllLabel);
+    filenameAllLabel = [filePath, experimentName, '_', num2str(numFiles), '_BackupLabelInfo'];
+    allLabelExcel = [filenameAllLabel '.xlsx'];
+    allLabelCsv = [filenameAllLabel '.csv'];
+    writetable(allLabel_Table, allLabelExcel);
+    writetable(allLabel_Table, allLabelCsv);
     
 end

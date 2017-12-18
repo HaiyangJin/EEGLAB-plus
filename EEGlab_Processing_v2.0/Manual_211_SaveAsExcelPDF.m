@@ -3,7 +3,7 @@
 
 % read the label backup files from '*.mat' and save in Excel
 [filenames,studyPath] = uigetfile({'*.mat','MAT-files (*.mat)'},...
-    'Please select all the files (*.mat) for backuping labels.', 'MultiSelect', 'on');
+    'Please select all the files (*.mat) for saving as Excel.', 'MultiSelect', 'on');
 
 % load the *.mat
 if ~iscell(filenames)
@@ -17,7 +17,7 @@ else
     
 end
 
-
+% save the raw mean data into Excel
 if exist('table_MeanRaw','var')
     sheetName_MeanRaw = [expFolder,'_MeanRaw'];
     rawMeanName = strcat(studyPath, sheetName_MeanRaw);
@@ -26,7 +26,7 @@ if exist('table_MeanRaw','var')
     writetable(table_MeanRaw, excelName_RawMean, 'Sheet', sheetName_MeanRaw);
 end
 
-
+% save the grand average data into Excel for locking time window
 if exist('table_GrandAver','var')
     
     sheetName_LockWindow = 'LockWindow';
@@ -40,6 +40,7 @@ if exist('table_GrandAver','var')
         'Sheet', sheetName_GrandAver, 'Range', 'B5');   
 end
 
+% save the topograph data into Excel for locating the signal
 if exist('table_GrandTopoCheck','var')
     
     sheetName_Topo = 'TopoCheck';

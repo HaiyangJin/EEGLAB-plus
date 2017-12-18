@@ -25,7 +25,7 @@ expFolder = ['20', experimentNum];
 for iElec = 1: numElec
     thisElec = electrode(iElec);
 
-    createFigure(STUDY,ALLEEG,thisElec,1,1)
+    createFigure(STUDY,ALLEEG,thisElec,1,1,1)
 
     figureName = [expFolder, '_Cluster_', num2str(thisElec)];  % Scramble_  Normal_
     print(figureName, '-dpdf', '-bestfit'); 

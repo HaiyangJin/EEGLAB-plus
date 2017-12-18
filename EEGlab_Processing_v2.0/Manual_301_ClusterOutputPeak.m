@@ -1,4 +1,4 @@
-%% Save mean of raw data and peak values into excel
+%% Save mean of raw data and peak values into excel and csv files
 experimentNum = [];
 while isempty(experimentNum)
     experimentNum = input('Please input the experiment Number (1, 2, 3, or 4): ','s');

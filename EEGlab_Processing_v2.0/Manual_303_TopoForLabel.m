@@ -1,4 +1,6 @@
 %% display the topography to check the location of the cluster
+% input 
+isDiff = input('Is this topograph for differences between Normal and Scramble?  1 (yes) 0(no)');
 % load the data for topography
 [fileNames, saveDir] = uigetfile('*.mat', 'Please choose the ''.mat'' file contains the raw mean (topo) data for topography.');
 load([saveDir,fileNames]); % load the raw data
@@ -20,17 +22,26 @@ for iPotential = 1:numPotential
     for iLabel = 1:numLabels
         
         % Name of the figure
-        namePart1 = table_TopoData.Properties.RowNames{iPotential,1};
-        namePart2 = table_TopoData.Properties.VariableNames{1,iLabel};
-        figureName = [namePart1, '-', namePart2];
+        namePart_Potential = table_TopoData.Properties.RowNames{iPotential,1};
+        namePart_Label = table_TopoData.Properties.VariableNames{1,iLabel};
+        figureName = [namePart_Potential, '-', namePart_Label];
         fileName = [expFolder, '-',figureName];
         
         % get the data for this potential and this label
         topoData = table_TopoData{iPotential,iLabel};
         
+        if isDiff == 1
+            if strcmp(namePart_Label(1), 'N')
+                scramLabel = ['S', namePart_Label(2:3)];
+                topoData_Scra = table_TopoData{iPotential,scramLabel};
+                topoData = topoData - topoData_Scra;
+                figureName = [figureName, '-NS'];
+            end
+        end
+        
         topoFig = figure('Name',figureName);
         topoplot(topoData, ALLEEG(1).chanlocs,...  % ALLEEG(1).chanlocs, chanLocations
-            'maplimits', [-4 5]);   % set the maximum and minimum value for all the value
+            'maplimits', [-5 5]);   % set the maximum and minimum value for all the value
 %             'electrodes', 'labels'); %             'electrodes', 'labels'... % show the name of the labels on their locations
 
         colorbar; % show the color bar

@@ -10,7 +10,7 @@
 
 
 %% % Prepaparation for different platform
-baselineStart = -200;
+baselineStart = -100;
 if isunix
     % get the experiment number
     ID = getenv('SLURM_ARRAY_TASK_ID');

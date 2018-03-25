@@ -39,6 +39,12 @@ switch experimentNum
         clusterNumN1 = [65 58 59 66 70 69 64; % PO7
                         90 96 91 84 83 89 95]; % PO8
     case '4'
+        windowsInfo = [96,136;   % time window for P1
+                      148,200];    % time window for N170
+        clusterNumP1 = [65 58 59 66 70 69 64; % PO7
+                        90 96 91 84 83 89 95]; % PO8
+        clusterNumN1 = [65 58 59 66 70 69 64; % PO7
+                        90 96 91 84 83 89 95]; % PO8
 end
         
 % clusterNumP1 = [65 58 59 66 70 69 64; % PO7
@@ -167,14 +173,27 @@ for iPotential = 1:length(potentials)
         
         % save the (three) IVs about lables into the peak value data cell
         thisLabel = clusterTable{iRow, numLabelVariable}{1};
-        if strcmp(expFolder, '201') %|| strcmp(expFolder, '204')
-            clusterPeakCell(iRow, NSColuNum) = {'N'};
-            clusterPeakCell(iRow, FHColuNum) = {thisLabel(1)};
-            clusterPeakCell(iRow, DurationColuNum) = {thisLabel(2:4)};
-        elseif strcmp(expFolder, '202') || strcmp(expFolder, '203')
-            clusterPeakCell(iRow, NSColuNum) = {thisLabel(1)};
-            clusterPeakCell(iRow, FHColuNum) = {thisLabel(2)};
-            clusterPeakCell(iRow, DurationColuNum) = {thisLabel(3)};
+%         if strcmp(expFolder, '201') %|| strcmp(expFolder, '204')
+%             clusterPeakCell(iRow, NSColuNum) = {'N'};
+%             clusterPeakCell(iRow, FHColuNum) = {thisLabel(1)};
+%             clusterPeakCell(iRow, DurationColuNum) = {thisLabel(2:4)};
+%         elseif strcmp(expFolder, '202') || strcmp(expFolder, '203')
+%             clusterPeakCell(iRow, NSColuNum) = {thisLabel(1)};
+%             clusterPeakCell(iRow, FHColuNum) = {thisLabel(2)};
+%             clusterPeakCell(iRow, DurationColuNum) = {thisLabel(3)};
+%         end
+        
+        clusterPeakCell(iRow, NSColuNum) = {thisLabel(1)};
+        clusterPeakCell(iRow, FHColuNum) = {thisLabel(2)};
+        switch thisLabel(3)
+            case '7'
+                clusterPeakCell(iRow, DurationColuNum) = {'17'};
+            case '5'
+                clusterPeakCell(iRow, DurationColuNum) = {'50'};
+            case '1'
+                clusterPeakCell(iRow, DurationColuNum) = {'100'};
+            case '2'
+                clusterPeakCell(iRow, DurationColuNum) = {'200'};
         end
         
         % find and save the peak values
@@ -218,7 +237,7 @@ for iPotential = 1:length(potentials)
     sheetNameRaw = [expFolder, '_', thisPotentialName, '_ClusterPeak'];
     writetable(clusterPeakTable, clusterFileName, 'Sheet', sheetNameRaw);
     csvFilename = [saveDir, sheetNameRaw, '.csv'];
-    writetable(clusterTable, csvFilename);
+    writetable(clusterPeakTable, csvFilename);
     
     disp(['Save the peak values ', thisPotentialName, ' into the excel file successfully!']);
     

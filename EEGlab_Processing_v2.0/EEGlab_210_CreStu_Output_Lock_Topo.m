@@ -106,7 +106,7 @@ elseif strcmp(experimentNum, '3')
         theParticipants = 1:20;
     end
 elseif strcmp(experimentNum, '4')
-    theParticipants = 1:20;
+    theParticipants = 1:22;
 end
 numParticipant = length(theParticipants); % the number of participants
 
@@ -149,7 +149,7 @@ if isBasedAcc == 1 % if the labels are only for correct ones
     endLetterLabel = cellfun(@(x) x(end), labels, 'UniformOutput', false);
     logicEndLabel = strcmp(endLetterLabel,'1');
     
-    if strcmp(experimentNum, '3')
+    if strcmp(experimentNum, '3') || strcmp(experimentNum, '4')
         % find the 17ms labels end with '0'
         letter3Label = cellfun(@(x) x(3), labels, 'UniformOutput', false);
         logic3Label = strcmp(letter3Label,'7');

@@ -25,13 +25,14 @@
 
 % This script can only run in the cluster.
 if ~isunix
-    error('This script can only run in Cluster!');
+    error('This script can only run in NeSI!');
 end
 
 %% input info
-% epochStart =  -0.5;
+% epochStart = -0.5;
 % epochEnd = 1;
-isHighFilter1 = 1; % if the high filter frequency is 1 Hz, 
+isHighFilter1 = 1;  % if the high filter frequency is 1 Hz, 
+addpath(['.', filesep, 'Common_Functions']);
 
 %% 100 Preparation %%% changes needed for new user %%%
 % get the ID (string) and name of this participant
@@ -69,6 +70,11 @@ oneRawFile = strcmp(participantName, 'P209') || strcmp(participantName, 'P211').
     || strcmp(participantName, 'P311')...
     || strcmp(experimentNum, '4');
 
+appendNeeded = 0;
+if strcmp(participantName, 'P426') || strcmp(participantName, 'P428')
+    appendNeeded = 1; 
+end
+
 %% PREPROCESSING %%
 % high frequency filter for the two rounds data 
 highFilter = [1, 0.1];
@@ -88,7 +94,9 @@ for iProcess = 1:(2-isHighFilter1)
         'option_scaleicarms', 1, 'option_rememberfolder', 1, 'option_donotusetoolboxes', 0, ...
         'option_checkversion', 1, 'option_chat', 0); % uncheck 'If set, use single precision under...'
     
-    if oneRawFile
+    if appendNeeded
+        AppendData;
+    elseif oneRawFile
         rawName = [participantName, '.RAW'];
         EEG = pop_readegi([expFolderPath, rawName], [],[],'auto');
     else
@@ -99,10 +107,10 @@ for iProcess = 1:(2-isHighFilter1)
     EEG = pop_saveset(EEG, 'filename',rawFilename,'filepath',expFolderPath); % save the raw data as backup
     
     %%%% 102 Change time point
-    EEG = correctTriggerLatency(EEG,50);
+    EEG = correctTriggerLatency(EEG, 50);
     
     %%%% 103 Re-sample to 250 Hz
-    EEG = pop_resample( EEG, 250);
+%     EEG = pop_resample(EEG, 250);
     
     %%%% 104 Filter the data between 1-Hz (high) and 50 Hz (low)
     EEG  = pop_basicfilter( EEG,  1:128 , 'Cutoff', [highFilter(iProcess) 50], ...

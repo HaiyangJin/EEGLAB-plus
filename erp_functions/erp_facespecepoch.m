@@ -1,3 +1,4 @@
+<<<<<<< refs/remotes/origin/master
 function specEpochTable = erp_facespecepoch(epoch_table)
 
 % remove the incorrect trials
@@ -9,18 +10,28 @@ if isResp
     epoch_table = epoch_table(~isIncor, :);
 end
 
+=======
+function specEpochTable = erp_facespecepoch(allEpoch)
+>>>>>>> First commit from Gitkraken
 
 
 %% Method 1
 % Specific face epoch data 
+<<<<<<< refs/remotes/origin/master
 isFace = cellfun(@(x) strcmp(x(2), 'F'), epoch_table{:, 'Event'});
 [~, isDataColu] = xposition(epoch_table.Properties.VariableNames);
 faceEpoch = epoch_table{isFace, isDataColu};  % epoch data for Face
 houseEpoch = epoch_table{~isFace, isDataColu};  % epoch data for House
+=======
+isFace = cellfun(@(x) strcmp(x(2), 'F'), allEpoch{:, 'Event'});
+faceEpoch = allEpoch{isFace, 6:end};  % epoch data for Face
+houseEpoch = allEpoch{~isFace, 6:end};  % epoch data for House
+>>>>>>> First commit from Gitkraken
 
 specfaceEpoch = faceEpoch - houseEpoch;
 
 % Independent variables
+<<<<<<< refs/remotes/origin/master
 specIV1 = epoch_table{isFace, 1:2};
 specIV2 = cellfun(@(x) [x(1), 'D', x(3:end)], epoch_table{isFace, 3}, 'UniformOutput', false);
 % specIV3 = epoch_table{isFace, 4:5};
@@ -28,6 +39,15 @@ specIV2 = cellfun(@(x) [x(1), 'D', x(3:end)], epoch_table{isFace, 3}, 'UniformOu
 specCell_v1 = [specIV1, specIV2, num2cell(specfaceEpoch)];
 
 specEpochTable = cell2table(specCell_v1, 'VariableNames', epoch_table.Properties.VariableNames);
+=======
+specIV1 = allEpoch{isFace, 1:2};
+specIV2 = cellfun(@(x) [x(1), 'D', x(3:end)], allEpoch{isFace, 3}, 'UniformOutput', false);
+specIV3 = allEpoch{isFace, 4:5};
+
+specCell_v1 = [specIV1, specIV2, specIV3 num2cell(specfaceEpoch)];
+
+specEpochTable = cell2table(specCell_v1, 'VariableNames', allEpoch.Properties.VariableNames);
+>>>>>>> First commit from Gitkraken
 
 
 %% Method 2

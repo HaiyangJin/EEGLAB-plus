@@ -15,7 +15,9 @@ parameters.isDenoise = 0;
 parameters.isColorbar = 0;
 parameters.plotWindow = [-200 996];
 
+saveSTData = 1;
 saveFigure = 0;
 
+
 %% Conduct the single trial analysis
-st_analysis(expCode, partCode, parameters, saveFigure);
+st_analysis(expCode, partCode, parameters, saveSTData, saveFigure);

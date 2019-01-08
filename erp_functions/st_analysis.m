@@ -1,4 +1,4 @@
-function st_analysis(expCode, partCode, parameters, saveFigure)
+function st_analysis(expCode, partCode, parameters, saveSTData, saveFigure)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
@@ -36,6 +36,10 @@ if ~arguments(5)
 %     warning('The default plot window (%d : %d) is used.', plotWindow);
 else
     plotWindow = parameters.plotWindow;
+end
+
+if saveSTData
+    stTable = table;
 end
 
 fprintf(['\n' repmat('=', 1, 60), ...
@@ -196,6 +200,10 @@ for iEvent = eventRange
                 trialMeanAmp = st_meanamp(clusterTrialTable, tw, thisComp);
                 if isDenoise 
                     noiseMeanAmp = st_meanamp(clusterNoiseTable, tw, thisComp);
+                end
+                
+                if saveSTData
+                    stTable = [stTable; trialMeanAmp];
                 end
                 
                 %% fit ex-gaussian function for every subject
@@ -423,6 +431,10 @@ if ispc || ismac
     conFitTable = conFitTable(:, 1:end-1);
     writetable(subjFitTable, [partCode '_Subj_Output.csv']);
     writetable(conFitTable, [partCode '_ConFitTable.csv']);
+end
+
+if saveSTData
+   save([studyPath expCode '_' paraCode '_' partCode '_SingleTrialData'], 'stTable');
 end
 
 fprintf('\nMission (Fitting model) Completed for %s/%d of the Experiment %s.\n', partCode, Ntotal, expCode);

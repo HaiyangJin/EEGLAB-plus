@@ -1,10 +1,10 @@
-function st_analysis(expCode, partCode, parameters, saveSTData, saveFigure)
+function st_analysis(expCode, partCode, parameters, saveSTData, isDistAna, saveFigure)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
     repmat('=', 1, 60) '\n\n'], partCode);
 
-if nargin < 3
+if nargin < 5
     error('Not enough arguments for st_analysis!');
 end
 
@@ -16,7 +16,7 @@ if ~arguments(1)
 else
     isCluster = parameters.isCluster;
 end
-if ~arguments(2) 
+if ~arguments(2)
     isgwindow = 1;
 else
     isgwindow = parameters.isgwindow;
@@ -27,13 +27,13 @@ else
     isDenoise = parameters.isDenoise;
 end
 if ~arguments(4)
-    isColorbar = 0;  % Do not plot 
+    isColorbar = 0;  % Do not plot
 else
     isColorbar = parameters.isColorbar;
 end
 if ~arguments(5)
     plotWindow = [-200 996];
-%     warning('The default plot window (%d : %d) is used.', plotWindow);
+    %     warning('The default plot window (%d : %d) is used.', plotWindow);
 else
     plotWindow = parameters.plotWindow;
 end
@@ -97,7 +97,7 @@ end
 
 
 %% Load all the trial epoch data
-fprintf('Reading the raw trial data...\n'); 
+fprintf('Reading the raw trial data...\n');
 rawTrialTable = st_trialmulti; %
 
 if isDenoise
@@ -179,15 +179,15 @@ for iEvent = eventRange
                 [~, clusterTrialTable] = erp_erpimage(trialTable, theCentChan, ...
                     plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
                 if saveFigure
-%                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
+                    %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
                     print([erpimageFolder 'erpimage-', figTitle], '-dpng', '-r300');  % '-dtiffn'
                 end
-
+                
                 if isDenoise
                     [~, clusterNoiseTable] = erp_erpimage(noiseTable, theCentChan, ...
                         plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
                     if saveFigure
-%                         saveas(erpfigure, [erpimageFolder 'Noise-ERPimages-', figTitle '.jpg']);
+                        %                         saveas(erpfigure, [erpimageFolder 'Noise-ERPimages-', figTitle '.jpg']);
                         print([erpimageFolder 'Noise-ERPimages-', figTitle], '-dpng', '-r300');  % '-dtiffn'
                     end
                 end
@@ -198,221 +198,226 @@ for iEvent = eventRange
                 % calculate the amplitude for every trial and plot the
                 % distribution
                 trialMeanAmp = st_meanamp(clusterTrialTable, tw, thisComp);
-                if isDenoise 
+                if isDenoise
                     noiseMeanAmp = st_meanamp(clusterNoiseTable, tw, thisComp);
                 end
                 
                 if saveSTData
-                    stTable = [stTable; trialMeanAmp];
+                    trialMeanAmp.Hemisphere = repmat({thisLR}, size(trialMeanAmp, 1), 1);
+                    trialMeanAmp.ACC = repmat({isCorStr}, size(trialMeanAmp, 1), 1);
+                    
+                    stTable = [stTable; trialMeanAmp]; %#ok<AGROW>
                 end
                 
-                %% fit ex-gaussian function for every subject
-                %%%%% fit exGaussian and save the parameters %%%%%
-                
-                %%%%% for every participant with loop %%%%%
-                subjCond = unique(trialMeanAmp.SubjCode);  % subject codes in this condition
-                nSubjCond = length(subjCond);
-                
-                for iSubj = 1:nSubjCond
-                    thisSubj = subjCond{iSubj};
+                if isDistAna
+                    %% fit ex-gaussian function for every subject
+                    %%%%% fit exGaussian and save the parameters %%%%%
                     
-                    isSubj = strcmp(trialMeanAmp.SubjCode, thisSubj);
-                    subjData = trialMeanAmp{isSubj, 'MeanAmp'};
+                    %%%%% for every participant with loop %%%%%
+                    subjCond = unique(trialMeanAmp.SubjCode);  % subject codes in this condition
+                    nSubjCond = length(subjCond);
                     
-                    if length(subjData) <= 4
-                        output.Count = length(subjData);
-                        output.model = sprintf('Only %d data point(s)', output.Count);
-                        mu = NaN;
-                        sigma = NaN;
-                        tau = NaN;
-                        output.iterations = NaN;
-                        output.funcCount = NaN;
-                        output.algorithm = '';
-                        output.message = sprintf('Only %d data point(s) for this bin.', output.Count);
-                    else
-                        fprintf(['\n' repmat('%%', 1, 50) '\n' ...
-                            'Fitting the ex-Gaussian model for Participant ' ...
-                            thisSubj ' in the ' figTitle ' condition...\n']);
+                    for iSubj = 1:nSubjCond
+                        thisSubj = subjCond{iSubj};
                         
-                        switch isColorbar
-                            case 1
-                                colorData = trialMeanAmp{isSubj, 'RT'};
-                            case 2
-                                colorData = []; % trialMeanAmp{isSubj, 'SubjCode'};
-                            case 0
-                                colorData = [];
-                        end
+                        isSubj = strcmp(trialMeanAmp.SubjCode, thisSubj);
+                        subjData = trialMeanAmp{isSubj, 'MeanAmp'};
                         
-                        [mu, sigma, tau, output] = erp_eg_fitplot(subjData, colorData, plotWindow);
-                        
-                        if saveFigure
-                            subjTitle = [thisSubj '-' figTitle];
-                            title(subjTitle)
-%                             saveas(fitfig, [subjFitFolder 'Distribution-', subjTitle '.jpg']);
-                            print([subjFitFolder 'Distribution-', subjTitle], '-dpng', '-r300');  % '-dtiffn'
-                        end
-                        
-                    end
-                    
-                    % levels of conditions
-                    nSubRow = nSubRow + 1;
-                    subjFit(nSubRow).SubjCode = {thisSubj};
-                    subjFit(nSubRow).Event = {thisEvent};
-                    subjFit(nSubRow).Component = {thisComp};
-                    subjFit(nSubRow).Hemisphere = {thisLR};
-                    subjFit(nSubRow).Channels = {theCentChan};
-                    subjFit(nSubRow).AllTrial = {isCorStr};
-                    subjFit(nSubRow).Count = output.count;
-                    subjFit(nSubRow).Model = output.model;
-                    subjFit(nSubRow).mu = mu;
-                    subjFit(nSubRow).sigma = sigma;
-                    subjFit(nSubRow).tau = tau;
-                    subjFit(nSubRow).Iterations = output.iterations;
-                    subjFit(nSubRow).funcCount = output.funcCount;
-                    subjFit(nSubRow).Algorithm = output.algorithm;
-                    subjFit(nSubRow).Message = {output.message};
-                    
-                    subjFit(nSubRow).isAd = output.isAd;
-                    subjFit(nSubRow).AdP = output.AdP;
-                    subjFit(nSubRow).isJb = output.isJb;
-                    subjFit(nSubRow).JbP = output.JbP;
-                    subjFit(nSubRow).isL = output.isL;
-                    subjFit(nSubRow).LP = output.LP;
-                    
-                end
-                
-                clear subjCond
-                clear nSubjCond
-                clear thisSubj
-                
-                %% fit the ex-guassian distribution for every condition
-                
-                % calculate the face specific peak
-                isFaceEvent = thisEvent(2) == 'F';
-                if isFaceEvent
-                    subjCodeFace = unique(trialMeanAmp.SubjCode);
-                    theHouseEvent = strrep(thisEvent, 'F', 'H');
-                    
-                    [tempImage, clusterHosueData] = erp_erpimage(trialTable, theCentChan, ...
-                        plotWindow, theHouseEvent, thisAcc, [], [], isCluster);
-                    close(tempImage);
-                    
-                    clsuterHousePeak = st_meanamp(clusterHosueData, tw, thisComp);
-%                     clsuterHousePeak = erp_peakoutput(clusterHosueData, timeWindow, 1);
-                    
-                    [G, SubjCodeHouse] = findgroups(clsuterHousePeak.SubjCode);
-                    Amplitude = splitapply(@mean, clsuterHousePeak.MeanAmp, G);
-                    thisHouseTable = table(SubjCodeHouse, Amplitude);
-                    
-                    fprintf('The number of participants in this condition is %d.\n', length(subjCodeFace));
-                    faceSpecPeak = table;
-                    for iSubj = 1:length(subjCodeFace)
-                        thisSubjFace = subjCodeFace{iSubj};
-                        
-                        thisFaceSpecPeak = trialMeanAmp(strcmp(trialMeanAmp.SubjCode, thisSubjFace), :);
-                        
-                        if ismember(thisSubjFace, SubjCodeHouse)
-                            houseAmp = thisHouseTable{strcmp(thisHouseTable.SubjCodeHouse, thisSubjFace), 2};
+                        if length(subjData) <= 4
+                            output.Count = length(subjData);
+                            output.model = sprintf('Only %d data point(s)', output.Count);
+                            mu = NaN;
+                            sigma = NaN;
+                            tau = NaN;
+                            output.iterations = NaN;
+                            output.funcCount = NaN;
+                            output.algorithm = '';
+                            output.message = sprintf('Only %d data point(s) for this bin.', output.Count);
                         else
-                            houseAmp = 0;
+                            fprintf(['\n' repmat('%%', 1, 50) '\n' ...
+                                'Fitting the ex-Gaussian model for Participant ' ...
+                                thisSubj ' in the ' figTitle ' condition...\n']);
+                            
+                            switch isColorbar
+                                case 1
+                                    colorData = trialMeanAmp{isSubj, 'RT'};
+                                case 2
+                                    colorData = []; % trialMeanAmp{isSubj, 'SubjCode'};
+                                case 0
+                                    colorData = [];
+                            end
+                            
+                            [mu, sigma, tau, output] = erp_eg_fitplot(subjData, colorData, plotWindow);
+                            
+                            if saveFigure
+                                subjTitle = [thisSubj '-' figTitle];
+                                title(subjTitle)
+                                %                             saveas(fitfig, [subjFitFolder 'Distribution-', subjTitle '.jpg']);
+                                print([subjFitFolder 'Distribution-', subjTitle], '-dpng', '-r300');  % '-dtiffn'
+                            end
+                            
                         end
                         
-                        thisFaceSpecPeak.faceSpecMeanAmp = thisFaceSpecPeak.MeanAmp ...
-                            - houseAmp;
+                        % levels of conditions
+                        nSubRow = nSubRow + 1;
+                        subjFit(nSubRow).SubjCode = {thisSubj};
+                        subjFit(nSubRow).Event = {thisEvent};
+                        subjFit(nSubRow).Component = {thisComp};
+                        subjFit(nSubRow).Hemisphere = {thisLR};
+                        subjFit(nSubRow).Channels = {theCentChan};
+                        subjFit(nSubRow).AllTrial = {isCorStr};
+                        subjFit(nSubRow).Count = output.count;
+                        subjFit(nSubRow).Model = output.model;
+                        subjFit(nSubRow).mu = mu;
+                        subjFit(nSubRow).sigma = sigma;
+                        subjFit(nSubRow).tau = tau;
+                        subjFit(nSubRow).Iterations = output.iterations;
+                        subjFit(nSubRow).funcCount = output.funcCount;
+                        subjFit(nSubRow).Algorithm = output.algorithm;
+                        subjFit(nSubRow).Message = {output.message};
                         
-                        faceSpecPeak = vertcat(faceSpecPeak, thisFaceSpecPeak); %#ok<AGROW>
-                        
-                        if size(faceSpecPeak, 1) > size(trialMeanAmp, 1)
-                            warning('Something is wrong with faceSpecPeak');
-                        end
+                        subjFit(nSubRow).isAd = output.isAd;
+                        subjFit(nSubRow).AdP = output.AdP;
+                        subjFit(nSubRow).isJb = output.isJb;
+                        subjFit(nSubRow).JbP = output.JbP;
+                        subjFit(nSubRow).isL = output.isL;
+                        subjFit(nSubRow).LP = output.LP;
                         
                     end
                     
-                    disOutput = [0, 1];
-                else
-                    disOutput = 0;
-                end
-                
-                if isDenoise
-                    disOutput = [disOutput, 2]; %#ok<AGROW>
-                end
-                
-                % save the distributions
-                for iFaceSpec = disOutput %%%%%%%%%%%%%%%%%%%%%%
-                    switch iFaceSpec
-                        case 1
-                            disTitle = ['FaceSpec-' figTitle];
-                            meanAmpData = faceSpecPeak.faceSpecMeanAmp;
-                            rtTable = faceSpecPeak;
-                        case 0
-                            disTitle = figTitle;
-                            meanAmpData = trialMeanAmp.MeanAmp;
-                            rtTable = trialMeanAmp;
-                        case 2
-                            disTitle = ['Noise-' figTitle];
-                            meanAmpData = noiseMeanAmp.MeanAmp;
-                            rtTable = noiseMeanAmp;
-                    end
+                    clear subjCond
+                    clear nSubjCond
+                    clear thisSubj
                     
-                    fprintf(['The number of data points used for plotting ' ...
-                        '%s is %d.\n'], disTitle, length(meanAmpData));
+                    %% fit the ex-guassian distribution for every condition
                     
-                    fprintf(['\n' repmat('%%', 1, 50) '\n' ...
-                        'Fitting the ex-Gaussian model for the ' disTitle ' condition...\n']);
-                    
-                    if length(meanAmpData) <= 4
-                        output.Count = length(meanAmpData);
-                        output.model = sprintf('Only %d data point(s)', output.Count);
-                        mu = NaN;
-                        sigma = NaN;
-                        tau = NaN;
-                        output.iterations = NaN;
-                        output.funcCount = NaN;
-                        output.algorithm = '';
-                        output.message = sprintf('Only %d data point(s) for this bin.', output.Count);
+                    % calculate the face specific peak
+                    isFaceEvent = thisEvent(2) == 'F';
+                    if isFaceEvent
+                        subjCodeFace = unique(trialMeanAmp.SubjCode);
+                        theHouseEvent = strrep(thisEvent, 'F', 'H');
+                        
+                        [tempImage, clusterHosueData] = erp_erpimage(trialTable, theCentChan, ...
+                            plotWindow, theHouseEvent, thisAcc, [], [], isCluster);
+                        close(tempImage);
+                        
+                        clsuterHousePeak = st_meanamp(clusterHosueData, tw, thisComp);
+                        %                     clsuterHousePeak = erp_peakoutput(clusterHosueData, timeWindow, 1);
+                        
+                        [G, SubjCodeHouse] = findgroups(clsuterHousePeak.SubjCode);
+                        Amplitude = splitapply(@mean, clsuterHousePeak.MeanAmp, G);
+                        thisHouseTable = table(SubjCodeHouse, Amplitude);
+                        
+                        fprintf('The number of participants in this condition is %d.\n', length(subjCodeFace));
+                        faceSpecPeak = table;
+                        for iSubj = 1:length(subjCodeFace)
+                            thisSubjFace = subjCodeFace{iSubj};
+                            
+                            thisFaceSpecPeak = trialMeanAmp(strcmp(trialMeanAmp.SubjCode, thisSubjFace), :);
+                            
+                            if ismember(thisSubjFace, SubjCodeHouse)
+                                houseAmp = thisHouseTable{strcmp(thisHouseTable.SubjCodeHouse, thisSubjFace), 2};
+                            else
+                                houseAmp = 0;
+                            end
+                            
+                            thisFaceSpecPeak.faceSpecMeanAmp = thisFaceSpecPeak.MeanAmp ...
+                                - houseAmp;
+                            
+                            faceSpecPeak = vertcat(faceSpecPeak, thisFaceSpecPeak); %#ok<AGROW>
+                            
+                            if size(faceSpecPeak, 1) > size(trialMeanAmp, 1)
+                                warning('Something is wrong with faceSpecPeak');
+                            end
+                            
+                        end
+                        
+                        disOutput = [0, 1];
                     else
-                        switch isColorbar
-                            case 1
-                                colorData = rtTable.RT;
-                            case 2
-                                colorData = rtTable.SubjCode;
-                            case 0
-                                colorData = [];
-                        end
-                        
-                        [mu, sigma, tau, output] = erp_eg_fitplot(meanAmpData, colorData, plotWindow);
-                        title(disTitle)
-                        if saveFigure
-%                             saveas(fitfig, [conFitFolder 'Distribution-', disTitle '.jpg']);
-                            print([conFitFolder 'Distribution-', disTitle], '-dpng', '-r300');  % '-dtiffn'
-                        end
+                        disOutput = 0;
                     end
                     
-                    nConRow = nConRow + 1;
-                    conFit(nConRow).Event = {thisEvent};
-                    conFit(nConRow).Component = {thisComp};
-                    conFit(nConRow).Hemisphere = {thisLR};
-                    conFit(nConRow).Channels = {theCentChan};
-                    conFit(nConRow).AllTrial = {isCorStr};
-                    conFit(nConRow).isFaceSpec = iFaceSpec;
-                    conFit(nConRow).Count = output.count;
-                    conFit(nConRow).Model = output.model;
-                    conFit(nConRow).mu = mu;
-                    conFit(nConRow).sigma = sigma;
-                    conFit(nConRow).tau = tau;
-                    conFit(nConRow).Iterations = output.iterations;
-                    conFit(nConRow).funcCount = output.funcCount;
-                    conFit(nConRow).Algorithm = output.algorithm;
-                    conFit(nConRow).Message = {output.message};
-                    conFit(nConRow).isDenoise = isDenoise;
+                    if isDenoise
+                        disOutput = [disOutput, 2]; %#ok<AGROW>
+                    end
                     
-                    conFit(nSubRow).isAd = output.isAd;
-                    conFit(nSubRow).AdP = output.AdP;
-                    conFit(nSubRow).isJb = output.isJb;
-                    conFit(nSubRow).JbP = output.JbP;
-                    conFit(nSubRow).isL = output.isL;
-                    conFit(nSubRow).LP = output.LP;
-                    
+                    % save the distributions
+                    for iFaceSpec = disOutput %%%%%%%%%%%%%%%%%%%%%%
+                        switch iFaceSpec
+                            case 1
+                                disTitle = ['FaceSpec-' figTitle];
+                                meanAmpData = faceSpecPeak.faceSpecMeanAmp;
+                                rtTable = faceSpecPeak;
+                            case 0
+                                disTitle = figTitle;
+                                meanAmpData = trialMeanAmp.MeanAmp;
+                                rtTable = trialMeanAmp;
+                            case 2
+                                disTitle = ['Noise-' figTitle];
+                                meanAmpData = noiseMeanAmp.MeanAmp;
+                                rtTable = noiseMeanAmp;
+                        end
+                        
+                        fprintf(['The number of data points used for plotting ' ...
+                            '%s is %d.\n'], disTitle, length(meanAmpData));
+                        
+                        fprintf(['\n' repmat('%%', 1, 50) '\n' ...
+                            'Fitting the ex-Gaussian model for the ' disTitle ' condition...\n']);
+                        
+                        if length(meanAmpData) <= 4
+                            output.Count = length(meanAmpData);
+                            output.model = sprintf('Only %d data point(s)', output.Count);
+                            mu = NaN;
+                            sigma = NaN;
+                            tau = NaN;
+                            output.iterations = NaN;
+                            output.funcCount = NaN;
+                            output.algorithm = '';
+                            output.message = sprintf('Only %d data point(s) for this bin.', output.Count);
+                        else
+                            switch isColorbar
+                                case 1
+                                    colorData = rtTable.RT;
+                                case 2
+                                    colorData = rtTable.SubjCode;
+                                case 0
+                                    colorData = [];
+                            end
+                            
+                            [mu, sigma, tau, output] = erp_eg_fitplot(meanAmpData, colorData, plotWindow);
+                            title(disTitle)
+                            if saveFigure
+                                %                             saveas(fitfig, [conFitFolder 'Distribution-', disTitle '.jpg']);
+                                print([conFitFolder 'Distribution-', disTitle], '-dpng', '-r300');  % '-dtiffn'
+                            end
+                        end
+                        
+                        nConRow = nConRow + 1;
+                        conFit(nConRow).Event = {thisEvent};
+                        conFit(nConRow).Component = {thisComp};
+                        conFit(nConRow).Hemisphere = {thisLR};
+                        conFit(nConRow).Channels = {theCentChan};
+                        conFit(nConRow).AllTrial = {isCorStr};
+                        conFit(nConRow).isFaceSpec = iFaceSpec;
+                        conFit(nConRow).Count = output.count;
+                        conFit(nConRow).Model = output.model;
+                        conFit(nConRow).mu = mu;
+                        conFit(nConRow).sigma = sigma;
+                        conFit(nConRow).tau = tau;
+                        conFit(nConRow).Iterations = output.iterations;
+                        conFit(nConRow).funcCount = output.funcCount;
+                        conFit(nConRow).Algorithm = output.algorithm;
+                        conFit(nConRow).Message = {output.message};
+                        conFit(nConRow).isDenoise = isDenoise;
+                        
+                        conFit(nSubRow).isAd = output.isAd;
+                        conFit(nSubRow).AdP = output.AdP;
+                        conFit(nSubRow).isJb = output.isJb;
+                        conFit(nSubRow).JbP = output.JbP;
+                        conFit(nSubRow).isL = output.isL;
+                        conFit(nSubRow).LP = output.LP;
+                        
+                    end
                 end
             end
         end
@@ -421,20 +426,22 @@ end
 
 
 %% save the exgaussian output table
-subjFitTable = struct2table(subjFit);
-conFitTable = struct2table(conFit);
-save([studyPath expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'conFitTable', 'partCode', 'paraCode');
-
-% save the file as *.csv
-if ispc || ismac
-    subjFitTable = subjFitTable(:, 1:end-1);
-    conFitTable = conFitTable(:, 1:end-1);
-    writetable(subjFitTable, [partCode '_Subj_Output.csv']);
-    writetable(conFitTable, [partCode '_ConFitTable.csv']);
+if isDistAna
+    subjFitTable = struct2table(subjFit);
+    conFitTable = struct2table(conFit);
+    save([studyPath expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'conFitTable', 'partCode', 'paraCode');
+    
+    % save the file as *.csv
+    if ispc || ismac
+        subjFitTable = subjFitTable(:, 1:end-1);
+        conFitTable = conFitTable(:, 1:end-1);
+        writetable(subjFitTable, [partCode '_Subj_Output.csv']);
+        writetable(conFitTable, [partCode '_ConFitTable.csv']);
+    end
 end
 
 if saveSTData
-   save([studyPath expCode '_' paraCode '_' partCode '_SingleTrialData'], 'stTable');
+    save([studyPath expCode '_' paraCode '_' partCode '_SingleTrialData'], 'stTable');
 end
 
 fprintf('\nMission (Fitting model) Completed for %s/%d of the Experiment %s.\n', partCode, Ntotal, expCode);

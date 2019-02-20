@@ -28,7 +28,7 @@ addpath('Common_Functions/');
 % be motified.
 
 % This script can only run in the cluster.
-accInfoFolder = {'All', 'Acc', 'ScramAcc'};
+accInfoFolder = {'All', 'Cor', 'Scr'};
 indiInfoFolder = {'Individual', 'Group'};
 if isunix && ~ismac
     %% 100 Preparation %%% changes needed for new user %%%
@@ -36,10 +36,10 @@ if isunix && ~ismac
     ID = getenv('SLURM_ARRAY_TASK_ID');  % name of this participant
     participantName = ['P' ID(2:4)];
     experimentNum = ID(2);  % get the experimentNum
-    disp(experimentNum);
+    disp(['The experiment number is ' experimentNum]);
     
     folderInfoNum = ID(1);
-    isAddTest = 0;
+    is2Block = 0;
     switch folderInfoNum
         case '1'
             basedAcc = 1; % all
@@ -59,8 +59,12 @@ if isunix && ~ismac
         case '6'
             basedAcc = 3; % scramAcc
             isIndividual = 2; % group
+        case '8'
+            is2Block = 1; % test the diff for two normal face 17ms condition (face specific)
+            basedAcc = 1; % scramCor
+            isIndividual = 1; % individual
         case '9'
-            isAddTest = 1; % test the diff for two normal face 17ms condition
+            is2Block = 1; % test the diff for two normal face 17ms condition (face specific)
             basedAcc = 3; % scramCor
             isIndividual = 1; % individual
     end
@@ -127,7 +131,7 @@ for iFile = 1:nFiles
     end
     
     % the filename and path for ALL PreProcessed data
-    if isAddTest == 0
+    if is2Block == 0
         preProcessedFolder = [isIndividualFolder, '_', isBasedAccFolder];
     else
         preProcessedFolder = 'Normal_17_Compare';
@@ -208,6 +212,18 @@ for iFile = 1:nFiles
         save(labelBackupName, 'labelsBackCell');
         events = events_all;
         
+%         if is2Block
+%             allEvents = unique({EEG.urevent.type});
+%             blockEvent = allEvents(cellfun(@(x) strcmp(x(1:3), 'blo'), allEvents));
+%             EEG = pop_selectevent( EEG, 'type', blockEvent, 'renametype','Block',...
+%                 'oldtypefield','Block','deleteevents','off','deleteepochs','off','invertepochs','off');
+%             
+%             block = EEG.event(tempEvent).Block;
+%             if ~strcmp(block, '')
+%                 EEG.event(tempEvent).type = strcat(EEG.event(tempEvent).type, '_', block(end));
+%             end
+%             
+%         end
     elseif basedAcc == 2
         % save all the responses events as {'RESP'}
 %         if ~strcmp(experimentNum, '5')
@@ -303,7 +319,7 @@ for iFile = 1:nFiles
         EEG = pop_selectevent( EEG, 'type', respEvents,'renametype','RESP',...
             'oldtypefield','RESP','deleteevents','off','deleteepochs','off','invertepochs','off');
         
-        if isAddTest
+        if is2Block
             blockEvent = allEvents(cellfun(@(x) strcmp(x(1:3), 'blo'), allEvents));
             EEG = pop_selectevent( EEG, 'type', blockEvent, 'renametype','Block',...
                 'oldtypefield','Block','deleteevents','off','deleteepochs','off','invertepochs','off');
@@ -313,14 +329,14 @@ for iFile = 1:nFiles
         for tempEvent = 1:length({EEG.event.type})
             tempLabel = EEG.event(tempEvent).type;  % this type (label)
             RESP = EEG.event(tempEvent).RESP;   % this response
-            if isAddTest; block = EEG.event(tempEvent).Block; end
+            if is2Block; block = EEG.event(tempEvent).Block; end
             
             %%% if the RT is longer than 1000ms, this trial will not be
             %%% included.
             %         if strcmp(tempLabel(1), 'N') && ~isempty(RESP)
             if ~strcmp(RESP,'') % if there is a label about acc
                 EEG.event(tempEvent).type = strcat(tempLabel, '_', RESP);
-                if isAddTest && ~strcmp(block, '')
+                if is2Block && ~strcmp(block, '')
                     EEG.event(tempEvent).type = strcat(EEG.event(tempEvent).type, '_', block(end));
                 end
                 
@@ -411,7 +427,7 @@ for iFile = 1:nFiles
                     'SF2+_RE11', 'SF2+_RE12', 'SF2+_RE13', 'SF2+_RE14', 'SF2+_RE15', ...
                     'SH7+_RE51', 'SH7+_RE52', 'SH7+_RE53', 'SH7+_RE54', 'SH7+_RE55', ...
                     'SH2+_RE51', 'SH2+_RE52', 'SH2+_RE53', 'SH2+_RE54', 'SH2+_RE55'};
-                if isAddTest
+                if is2Block
                     no2Events = cellfun(@(x) x(3) ~= '2', eventsBackup);
                     eventsBackup = [cellfun(@(x) [x '_1'], eventsBackup(no2Events),  ...
                         'UniformOutput', false), ...

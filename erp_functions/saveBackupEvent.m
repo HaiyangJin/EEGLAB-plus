@@ -6,12 +6,9 @@ if nargin < 1 || isempty(filePath)
 % read the label backup files from '*.mat' and save in Excel
 [filenames,filePath] = uigetfile({'*.mat','MAT-files (*.mat)'},...
     'Please select all the (*.mat) files on labels for saving as Excel.', 'MultiSelect', 'on');
-<<<<<<< refs/remotes/origin/master:erp_functions/saveBackupEvent.m
 else
     filenames = dir([filePath '*LabelNumBackup.mat']);
 end
-=======
->>>>>>> First commit from Gitkraken:EEGlab_Processing_v2.0/Manual_121_Backup_label_info_Excel.m
 
 % create a cell to save all the backup labels
 if ~iscell(filenames)

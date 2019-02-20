@@ -77,8 +77,8 @@ conWindowTable_local = erp_conwinpeak(conEpochTable, gwindowTable);  % local mea
 conWindowTable_meanAmp = erp_conwinpeak(conEpochTable, gwindowTable, 2); % mean amplitude
 
 % Output the (local) mean amplitude
-writetable(conWindowTable_local(:, 1:end-1), [peakFilename '_local.csv']);
-writetable(conWindowTable_meanAmp(:, 1:end-1), [peakFilename '_meanAmp.csv']);
+writetable(conWindowTable_local, [peakFilename '_local.csv']);
+writetable(conWindowTable_meanAmp, [peakFilename '_meanAmp.csv']);
 
 
 %% Face specific ERPs
@@ -92,7 +92,7 @@ writetable(conWindowTable_meanAmp(:, 1:end-1), [peakFilename '_meanAmp.csv']);
 
 %% save final grand time window and condition time window for single trial analysis
 if strcmpi(analysisCode, 'all')
-    save('finalTW', 'gwindowTable', 'conWindowTable_local', 'conWindowTable_meanAmp');
+    save('finalTW', 'gwindowTable', 'conWindowTable_local');
 end
 
 end

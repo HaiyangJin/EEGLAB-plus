@@ -1,6 +1,12 @@
 function [conTable, subjTable, paraCode] = st_savestoutput(expCode) %#ok<STOUT>
 % save the output from single trial analysis in Cluster
 
+oldPath = pwd;
+if nargin < 1 || isempty(expCode)
+    thePath = uigetdir('.', 'Please select the folder where the exGaussian files are stored...');
+    cd(thePath);
+end
+
 files = dir([expCode '*exGaussian_Output.mat']);
 
 nFile = size(files, 1);
@@ -30,6 +36,8 @@ end
 
 writetable(conTable, [expCode '_' paraCode '_ConFitTable.csv']);
 writetable(subjTable, [expCode '_' paraCode '_Subj_Output.csv']);
+
+cd(oldPath);
 
 end
 

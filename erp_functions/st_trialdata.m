@@ -1,4 +1,4 @@
-function  trialEpochTable = st_trialdata(EEG, respEvent, isacc)
+function  trialEpochTable = st_trialdata(EEG, respEvent, blockEvent, isacc)
 % EEG: from eeglab
 % event(cell): event of the epochs
 % respEvent(cell): event of the reponses
@@ -10,17 +10,25 @@ function  trialEpochTable = st_trialdata(EEG, respEvent, isacc)
 if nargin < 1
     error('Not enough inputs for eeg_trialdata!');
 end
+if nargin < 3 || isempty(respEvent) || isempty(blockEvent)
+    events = unique({EEG.event.type});
+end
 if nargin < 2
     %     respEvent = {'RES0' 'RES1'};
-    events = unique({EEG.event.type});
     respEvent = events(cellfun(@(x) strcmp(x(1:2), 'RE'), events));
 end
 if nargin < 3
+    blockEvent = events(cellfun(@(x) strcmp(x(1:3), 'blo'), events));
+end
+if nargin < 4
     isacc = 1;
 end
 
 % check if there is RT (latnecy) information for the events
 isRT = logical(sum(ismember(respEvent, {EEG.event.type})));
+
+% check if there is block information for the events
+isBlock = logical(sum(ismember(blockEvent, {EEG.event.type})));
 
 
 %% get information from EEG
@@ -58,7 +66,14 @@ for iTrial = 1:nTrial
     end
     Event = repmat(theEvents(isOnset), nRow, 1);
     
-    
+    if isBlock
+        isBlockTemp = cellfun(@(x) strcmp(x(1:3), 'blo'), theEvents);
+        blockStr = theEvents{isBlockTemp};
+        Block = repmat({blockStr(regexp(blockStr, '\d'))}, nRow, 1);
+    else
+        Block = repmat({''}, nRow, 1);
+    end
+        
     if isacc % if there is accuracy data
         isResp = cellfun(@(x) strcmp(x(1:2), 'RE'), theEvents);
         if any(isResp) % Accuracy
@@ -71,9 +86,11 @@ for iTrial = 1:nTrial
     
     if isRT  % Response times
         RT = repmat(latency(1, iTrial), nRow, 1);
+    else
+        RT = NaN(nRow, 1);
     end
     
-    thisIVTable = table(Channel, Event, Response, RT);
+    thisIVTable = table(Channel, Event, Block, Response, RT);
     thisDVTable = array2table(thisTrialData, 'VariableNames', varNames);
     
     trialEpochTableIV = vertcat(trialEpochTableIV, thisIVTable); %#ok<AGROW>

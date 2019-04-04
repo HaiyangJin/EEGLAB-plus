@@ -9,7 +9,9 @@ clusterArray = [65 58 59 66 70 69 64; % PO7
     58 51 59 65 64 57 50; % P7
     96 97 91 90 95 100 101; % P8
     64 57 58 65 69 68 63; % P9
-    95 100 99 94 89 90 96]; % P10
+    95 100 99 94 89 90 96; % P10
+    69 64 65 70 74 73 68;
+    89 95 94 88 82 83 90]; %
 
 clusterNames = channame(clusterArray);
 allCentChan = clusterNames(:, 1);

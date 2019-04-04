@@ -129,13 +129,12 @@ nComp = length(components);
 
 % other fixed information
 LR = {'Left', 'Right'};
-correctStr = {'all', 'incorrect', 'correct'};
 if ~strcmp(expCode, '205')
     accCode = {[], '0', '1'};  % all the trials, incorrect trials, and correct trials
 else
-    warning('Please set up the response code for E205!');
-    accCode = {[]};
+    accCode = {[], '11', '12', '13', '14', '15', '51', '52', '53', '54', '55'};
 end
+correctStr = horzcat('all', cellfun(@(x) ['RESP' x], accCode(2:end), 'UniformOutput', false));
 
 if isCluster; clusterStr = 'Cluster'; else clusterStr = 'SingleChannel'; end %#ok<SEPEX>
 subjFit = struct;
@@ -176,8 +175,11 @@ for iEvent = eventRange
                     'Plotting the ERP-image for the condition: %s...\n'], figTitle);
                 
                 %%%%%  plot and save the erp images  %%%%%
-                [~, clusterTrialTable] = erp_erpimage(trialTable, theCentChan, ...
+                [~, clusterTrialTable, isNoData] = erp_erpimage(trialTable, theCentChan, ...
                     plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
+                
+                if isNoData; return; end
+                
                 if saveFigure
                     %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
                     print([erpimageFolder 'erpimage-', figTitle], '-dpng', '-r300');  % '-dtiffn'
@@ -204,7 +206,7 @@ for iEvent = eventRange
                 
                 if saveSTData
                     trialMeanAmp.Hemisphere = repmat({thisLR}, size(trialMeanAmp, 1), 1);
-                    trialMeanAmp.ACC = repmat({isCorStr}, size(trialMeanAmp, 1), 1);
+                    trialMeanAmp.ACC = repmat({thisAcc}, size(trialMeanAmp, 1), 1);
                     
                     stTable = [stTable; trialMeanAmp]; %#ok<AGROW>
                 end

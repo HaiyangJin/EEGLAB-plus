@@ -120,7 +120,10 @@ downsampling = 1;
 colorLimit = [-6 6];
 
 outputFig = figure; 
-erpimage(data', sortVar, xAxis, imageTitle, smooth, downsampling, 'cbar','on','caxis', colorLimit);
+
+if sum(isXCluster) > 10
+    erpimage(data', sortVar, xAxis, imageTitle, smooth, downsampling, 'cbar','on','caxis', colorLimit);
+end
 
 
 %% Output the cluster data for every trial

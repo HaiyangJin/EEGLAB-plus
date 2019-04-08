@@ -1,4 +1,4 @@
-function conWindowTable = erp_conwinpeak(conEpochTable, gwindowTable, method, isPlot)
+function conWindowTable = erp_binwindowpeak(conEpochTable, gwindowTable, method, isPlot)
 % calculate the (local) mean amplitude for the averaged epoch data for
 % every condition
 

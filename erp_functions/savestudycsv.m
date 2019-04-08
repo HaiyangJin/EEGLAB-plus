@@ -71,10 +71,10 @@ writetable(cell2table(topoChanComp), [topoFilename, '.xlsx'], 'Sheet', 'TopoChan
 
 %% calculate the amplitude for every bin
 % get the epoch data for every condition
-conEpochTable = erp_conepochtable(epoch_table, gwindowTable, isCluster);
+conEpochTable = erp_binepochtable(epoch_table, gwindowTable, isCluster);
 % get the local mean amplitude information for every bin
-conWindowTable_local = erp_conwinpeak(conEpochTable, gwindowTable);  % local mean amplitude
-conWindowTable_meanAmp = erp_conwinpeak(conEpochTable, gwindowTable, 2); % mean amplitude
+conWindowTable_local = erp_binwindowpeak(conEpochTable, gwindowTable);  % local mean amplitude
+conWindowTable_meanAmp = erp_binwindowpeak(conEpochTable, gwindowTable, 2); % mean amplitude
 
 % Output the (local) mean amplitude
 writetable(conWindowTable_local, [peakFilename '_local.csv']);
@@ -84,9 +84,9 @@ writetable(conWindowTable_meanAmp, [peakFilename '_meanAmp.csv']);
 %% Face specific ERPs
 % specEpochTable = erp_facespecepoch(epoch_table);
 % 
-% specConEpochTable = erp_conepochtable(specEpochTable, gwindowTable, isCluster);
+% specConEpochTable = erp_binepochtable(specEpochTable, gwindowTable, isCluster);
 % % Output the peak value
-% specConWindowTable = erp_conwinpeak(specConEpochTable, gwindowTable);
+% specConWindowTable = erp_binwindowpeak(specConEpochTable, gwindowTable);
 % writetable(specConWindowTable, [peakFilename '_spec.csv']);
 
 

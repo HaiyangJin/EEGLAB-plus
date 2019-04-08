@@ -5,6 +5,11 @@ function epoch_table = study_chandata(STUDY, ALLEEG, channel)
 % channel: The channel whose data you want to output (e.g. [65 90]),
 %          default is all the channels. 
 
+% The current script could only output the averaged bin epoch data based on
+% the events. (But cannot based on the acc or block)
+% In order to divide the data based on responses or blocks. Please use the
+% custom command. (st_analysis) with (saveBinEpoch = 1)
+
 if nargin < 2
     error('Not enough input arguments.');
 end

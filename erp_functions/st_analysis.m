@@ -175,16 +175,15 @@ for iEvent = eventRange
                     'Plotting the ERP-image for the condition: %s...\n'], figTitle);
                 
                 %%%%%  plot and save the erp images  %%%%%
-                [~, clusterTrialTable, isNoData] = erp_erpimage(trialTable, theCentChan, ...
+                [outFigure, clusterTrialTable] = erp_erpimage(trialTable, theCentChan, ...
                     plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
                 
-                if ~isNoData
-                    
-                    if toSaveFigure
-                        %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
-                        print([erpimageFolder 'erpimage-', figTitle], '-dpng', '-r300');  % '-dtiffn'
-                    end
-                    
+                if ~isempty(outFigure) && toSaveFigure
+                    %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
+                    print([erpimageFolder 'erpimage-', figTitle], '-dpng', '-r300');  % '-dtiffn'
+                end
+                
+                if ~isempty(clusterTrialTable)
                     if isDenoise
                         [~, clusterNoiseTable] = erp_erpimage(noiseTable, theCentChan, ...
                             plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
@@ -418,7 +417,6 @@ for iEvent = eventRange
                             conFit(nSubRow).JbP = output.JbP;
                             conFit(nSubRow).isL = output.isL;
                             conFit(nSubRow).LP = output.LP;
-                            
                         end
                     end
                 end

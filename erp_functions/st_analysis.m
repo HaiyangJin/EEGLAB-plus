@@ -1,10 +1,10 @@
-function st_analysis(expCode, partCode, parameters, saveSTData, isDistAna, toSaveFigure)
+function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
     repmat('=', 1, 60) '\n\n'], partCode);
 
-if nargin < 5
+if nargin < 3
     error('Not enough arguments for st_analysis!');
 end
 
@@ -38,8 +38,24 @@ else
     plotWindow = parameters.plotWindow;
 end
 
-if saveSTData
-    stTable = table;
+if nargin < 4 || isempty(saveAmpData)
+    saveAmpData = 1;
+end
+if nargin < 5 || isempty(saveBinEpoch)
+    saveBinEpoch = 1;
+end
+if nargin < 6 || isempty(isDistAna)
+    isDistAna = 0;
+end
+if nargin < 7 || isempty(toSaveFigure)
+    toSaveFigure = 0;
+end
+
+if saveAmpData
+    ST_MeanAmpTable = table;
+end
+if saveBinEpoch
+    ST_BinEpochTable = table;
 end
 
 fprintf(['\n' repmat('=', 1, 60), ...
@@ -181,6 +197,9 @@ for iEvent = eventRange
                 if ~isempty(outFigure) && toSaveFigure
                     %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
                     print([erpimageFolder 'erpimage-', figTitle], '-dpng', '-r300');  % '-dtiffn'
+                    
+                    fprintf(['Successfully plot the ERP-image for condition: %s.\n' ...
+                        repmat('-', 1, 80) '\n\n' ], figTitle);
                 end
                 
                 if ~isempty(clusterTrialTable)
@@ -190,12 +209,20 @@ for iEvent = eventRange
                         if toSaveFigure
                             %                         saveas(erpfigure, [erpimageFolder 'Noise-ERPimages-', figTitle '.jpg']);
                             print([erpimageFolder 'Noise-ERPimages-', figTitle], '-dpng', '-r300');  % '-dtiffn'
+                            fprintf(['Successfully plot the Noise ERP-image for condition: %s.\n' ...
+                                repmat('-', 1, 80) '\n\n' ], figTitle);
                         end
                     end
                     
-                    fprintf(['Successfully plot the ERP-image for condition: %s.\n' ...
-                        repmat('-', 1, 80) '\n\n' ], figTitle);
-                    
+                    if saveBinEpoch
+                        % save the bin epoch table for the current bin
+                        clusterTrialTable.Response = repmat({thisAcc}, size(clusterTrialTable, 1), 1);
+                        clusterTrialTable.Hemisphere = repmat({thisLR}, size(clusterTrialTable, 1), 1);
+                        clusterTrialTable.Component = repmat({thisComp}, size(clusterTrialTable, 1), 1);
+                        
+                        ST_BinEpochTable = [ST_BinEpochTable; clusterTrialTable]; %#ok<AGROW>
+                    end
+
                     % calculate the amplitude for every trial and plot the
                     % distribution
                     trialMeanAmp = st_meanamp(clusterTrialTable, tw, thisComp);
@@ -203,11 +230,12 @@ for iEvent = eventRange
                         noiseMeanAmp = st_meanamp(clusterNoiseTable, tw, thisComp);
                     end
                     
-                    if saveSTData
-                        trialMeanAmp.Hemisphere = repmat({thisLR}, size(trialMeanAmp, 1), 1);
-                        trialMeanAmp.ACC = repmat({thisAcc}, size(trialMeanAmp, 1), 1);
+                    if saveAmpData
+                        % save the mean amplitude for every single trial
                         
-                        stTable = [stTable; trialMeanAmp]; %#ok<AGROW>
+%                         trialMeanAmp.Hemisphere = repmat({thisLR}, size(trialMeanAmp, 1), 1);
+%                         trialMeanAmp.ACC = repmat({thisAcc}, size(trialMeanAmp, 1), 1);
+                        ST_MeanAmpTable = [ST_MeanAmpTable; trialMeanAmp]; %#ok<AGROW>
                     end
                     
                     if isDistAna
@@ -441,8 +469,11 @@ if isDistAna
     end
 end
 
-if saveSTData
-    save([studyPath expCode '_' paraCode '_' partCode '_SingleTrialData'], 'stTable');
+if saveAmpData
+    save([studyPath expCode '_' paraCode '_' partCode '_ST_MeanAmp'], 'ST_MeanAmpTable');
+end
+if saveBinEpoch
+    save([studyPath expCode '_' paraCode '_' partCode '_ST_BinEpoch'], 'ST_BinEpochTable'); 
 end
 
 fprintf('\nMission (Fitting model) Completed for %s/%d of the Experiment %s.\n', partCode, Ntotal, expCode);

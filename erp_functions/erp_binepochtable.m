@@ -1,10 +1,10 @@
-function conEpochTable = erp_binepochtable(epoch_table, gwindowTable, isCluster)
+function binEpochTable = erp_binepochtable(epoch_table, gwindowTable, isCluster)
 % This function reads epoch_table for all channels and output the mean of
 % the cluster for each hemisphere for every bin.
 % (averaged epoch data for every condition) The data usually got from the STUDY in eeglab  
 
 % Output:
-% conEpochTable: epoch table for every condition
+% binEpochTable: epoch table for every condition
 
 % Input:
 % gwindowTable: the grand time window table
@@ -80,4 +80,4 @@ for iComp = 1:nComp
     end
 end
 
-conEpochTable = compPeakOut;
+binEpochTable = compPeakOut;

@@ -115,7 +115,7 @@ end
 %% Load all the trial epoch data
 fprintf('Reading the raw trial data...\n');
 channels = unique(tw.ChanCluster(:));
-rawTrialTable = st_trialmulti([], channels); %
+rawTrialTable = st_trialmulti('.', channels); %
 
 % correct the RT, as there is a offset of about 33ms (comparing with
 % E-prime results)

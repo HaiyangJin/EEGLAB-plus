@@ -116,10 +116,10 @@ end
 
 
 %% Output the cluster data for every trial
-IVs = trialTable(logical(isCenChan .* isEvent .* isAcc .* isSubj), {'SubjCode', 'Event', 'Block'});
+IVs = trialTable(logical(isCenChan .* isEvent .* isAcc .* isSubj), ~isDataColu);
 IVs.ChanCent = repmat(chanCent, size(IVs, 1), 1);
 IVs.ChanCluster = repmat(chanName, size(IVs, 1), 1);
-IVs.RT = sortVar';
+% IVs.RT = sortVar';
 DVs = array2table(data, 'VariableNames', dataVarNames(logical(isYData)));
 
 clusterTrialTable = [IVs, DVs];

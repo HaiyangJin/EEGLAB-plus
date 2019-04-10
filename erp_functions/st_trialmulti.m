@@ -40,22 +40,16 @@ end
 
 if nFiles == 1
     EEG = pop_loadset('filename',filenames,'filepath',studyPath);
-    allTrialTable = st_trialdata(EEG);
+    allTrialTable = st_trialdata(EEG, channels);
 else
+    allTrialTable = table;
     for iFile = 1:nFiles
         thisFilename = filenames{1, iFile}; % this filename
         EEG = pop_loadset('filename',thisFilename,'filepath',studyPath);
         
-        thisAllTrialEpoch = st_trialdata(EEG);
-        
-        % To reduce the demand of the memory, only save the potential used electrodues
-        isChan = ismember(thisAllTrialEpoch{:, 'Channel'}, channels);
-        thisData = thisAllTrialEpoch(isChan, :);
-        if iFile == 1
-            allTrialTable = thisData;
-        else
-            allTrialTable = vertcat(allTrialTable, thisData); %#ok<AGROW>
-        end
+        thisAllTrialEpoch = st_trialdata(EEG, channels);
+
+        allTrialTable = vertcat(allTrialTable, thisAllTrialEpoch); %#ok<AGROW>
     end
 end
 

@@ -19,7 +19,7 @@ else
     channels = sort(cellfun(@(x) str2double(x(2:end)), channels)); % convert cell to numbers
 end
 if nargin < 3 || isempty(onsetEvent) || isempty(respEvent) || isempty(blockEvent)
-    events = unique({EEG.event.type});
+    events = unique({EEG.urevent.type});
 end
 if nargin < 3
     onsetEvent = events(cellfun(@(x) strcmp(x(end), '+'), events));

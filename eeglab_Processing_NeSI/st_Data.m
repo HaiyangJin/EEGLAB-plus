@@ -17,10 +17,11 @@ parameters.isDenoise = 0;
 parameters.isColorbar = 0;
 parameters.plotWindow = [-200 996];
 
-saveSTData = 1;
+saveAmpData = 1;
+saveBinEpoch = 1;
 isDistAna = 0;
-saveFigure = 0;
+toSaveFigure = 0;
 
 
 %% Conduct the single trial analysis
-st_analysis(expCode, partCode, parameters, saveSTData, isDistAna, saveFigure);
+st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure);

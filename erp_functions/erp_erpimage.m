@@ -77,21 +77,7 @@ nPoint = length(dataVarNames);
 
 isYData = zeros(1, nPoint);
 if isempty(plotWindow)
-%     isWindow = [1, nPoint];
     plotWindow = [-str2double(dataVarNames{1}(2:end)), str2double(dataVarNames{nPoint}(2:end))];
-  
-%     isWindow = zeros(1, 2);
-%     
-%     
-%     for iW = 1:2
-%         thisPoint = plotwindow(iW);
-%         if thisPoint < 0
-%             tempPoint = ['N', num2str(abs(thisPoint))];
-%         elseif thisPoint >= 0
-%             tempPoint = ['P', num2str(abs(thisPoint))];
-%         end
-%         isWindow(iW) = find(ismember(pointNames, tempPoint));
-%     end
 end
 windowStart = xposition(dataVarNames, plotWindow(1));
 windowEnd =  xposition(dataVarNames, plotWindow(2));

@@ -152,11 +152,11 @@ nComp = length(components);
 % other fixed information
 LR = {'Left', 'Right'};
 if ~strcmp(expCode, '205')
-    accCode = {[], '0', '1'};  % all the trials, incorrect trials, and correct trials
+    respCode = {[], '0', '1'};  % all the trials, incorrect trials, and correct trials
 else
-    accCode = {[], '11', '12', '13', '14', '15', '51', '52', '53', '54', '55'};
+    respCode = {[], '11', '12', '13', '14', '15', '51', '52', '53', '54', '55'};
 end
-correctStr = horzcat('all', cellfun(@(x) ['RESP' x], accCode(2:end), 'UniformOutput', false));
+respStr = horzcat('all', cellfun(@(x) ['RESP' x], respCode(2:end), 'UniformOutput', false));
 
 if isCluster; clusterStr = 'Cluster'; else clusterStr = 'SingleChannel'; end %#ok<SEPEX>
 subjFit = struct;
@@ -185,20 +185,20 @@ for iEvent = eventRange
             theCentChans = tw{iComp, 'ChanCent'};
             theCentChan = theCentChans{iLR};
             
-            for iAcc = 1:length(accCode)
-                thisAcc = accCode{iAcc};
-                isCorStr = correctStr{1, iAcc};
+            for iResp = 1:length(respCode)
+                thisResp = respCode{iResp};
+                thisRespStr = respStr{1, iResp};
                 
                 %% Plot erp-images
                 figTitle = sprintf([repmat('%s-', 1, 5) '%s'], ...
-                    thisComp, thisEvent, thisLR, theCentChan, isCorStr, clusterStr);
+                    thisComp, thisEvent, thisLR, theCentChan, thisRespStr, clusterStr);
                 
                 fprintf(['\n' repmat('-', 1, 80) '\n' ...
                     'Plotting the ERP-image for the condition: %s...\n'], figTitle);
                 
                 %%%%%  plot and save the erp images  %%%%%
                 [outFigure, clusterTrialTable] = erp_erpimage(trialTable, theCentChan, ...
-                    plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
+                    plotWindow, thisEvent, thisResp, [], figTitle, isCluster);
                 
                 if ~isempty(outFigure) && toSaveFigure
                     %                     saveas(erpfigure, [erpimageFolder 'erpimage-', figTitle '.jpg']);
@@ -208,24 +208,27 @@ for iEvent = eventRange
                         repmat('-', 1, 80) '\n\n' ], figTitle);
                 end
                 
-                if ~isempty(clusterTrialTable)
-                    if isDenoise
-                        [~, clusterNoiseTable] = erp_erpimage(noiseTable, theCentChan, ...
-                            plotWindow, thisEvent, thisAcc, [], figTitle, isCluster);
-                        if toSaveFigure
-                            %                         saveas(erpfigure, [erpimageFolder 'Noise-ERPimages-', figTitle '.jpg']);
-                            print([erpimageFolder 'Noise-ERPimages-', figTitle], '-dpng', '-r300');  % '-dtiffn'
-                            fprintf(['Successfully plot the Noise ERP-image for condition: %s.\n' ...
-                                repmat('-', 1, 80) '\n\n' ], figTitle);
-                        end
+                % Denoise the data
+                if isDenoise
+                    [~, clusterNoiseTable] = erp_erpimage(noiseTable, theCentChan, ...
+                        plotWindow, thisEvent, thisResp, [], figTitle, isCluster);
+                    if toSaveFigure
+                        %                         saveas(erpfigure, [erpimageFolder 'Noise-ERPimages-', figTitle '.jpg']);
+                        print([erpimageFolder 'Noise-ERPimages-', figTitle], '-dpng', '-r300');  % '-dtiffn'
+                        fprintf(['Successfully plot the Noise ERP-image for condition: %s.\n' ...
+                            repmat('-', 1, 80) '\n\n' ], figTitle);
                     end
+                end
+                
+                % only continue when there are some data in the table 
+                if ~isempty(clusterTrialTable) 
                     
-                    if saveBinEpoch
+                    clusterTrialTable.Response = regexp(clusterTrialTable.urResponse, '\d*', 'Match');
+                    clusterTrialTable.Hemisphere = repmat({thisLR}, size(clusterTrialTable, 1), 1);
+                    clusterTrialTable.Component = repmat({thisComp}, size(clusterTrialTable, 1), 1);
+
+                    if saveBinEpoch && isempty(thisResp)  % only save data when it is for all trials
                         % save the bin epoch table for the current bin
-                        clusterTrialTable.Response = repmat({thisAcc}, size(clusterTrialTable, 1), 1);
-                        clusterTrialTable.Hemisphere = repmat({thisLR}, size(clusterTrialTable, 1), 1);
-                        clusterTrialTable.Component = repmat({thisComp}, size(clusterTrialTable, 1), 1);
-                        
                         ST_BinEpochTable = [ST_BinEpochTable; clusterTrialTable]; %#ok<AGROW>
                     end
 
@@ -236,7 +239,7 @@ for iEvent = eventRange
                         noiseMeanAmp = st_meanamp(clusterNoiseTable, tw, thisComp);
                     end
                     
-                    if saveAmpData
+                    if saveAmpData && isempty(thisResp) % only save data when it is for all trials
                         % save the mean amplitude for every single trial
                         
 %                         trialMeanAmp.Hemisphere = repmat({thisLR}, size(trialMeanAmp, 1), 1);
@@ -300,7 +303,7 @@ for iEvent = eventRange
                             subjFit(nSubRow).Component = {thisComp};
                             subjFit(nSubRow).Hemisphere = {thisLR};
                             subjFit(nSubRow).Channels = {theCentChan};
-                            subjFit(nSubRow).AllTrial = {isCorStr};
+                            subjFit(nSubRow).AllTrial = {thisRespStr};
                             subjFit(nSubRow).Count = output.count;
                             subjFit(nSubRow).Model = output.model;
                             subjFit(nSubRow).mu = mu;
@@ -333,7 +336,7 @@ for iEvent = eventRange
                             theHouseEvent = strrep(thisEvent, 'F', 'H');
                             
                             [tempImage, clusterHosueData] = erp_erpimage(trialTable, theCentChan, ...
-                                plotWindow, theHouseEvent, thisAcc, [], [], isCluster);
+                                plotWindow, theHouseEvent, thisResp, [], [], isCluster);
                             close(tempImage);
                             
                             clsuterHousePeak = st_meanamp(clusterHosueData, tw, thisComp);
@@ -432,7 +435,7 @@ for iEvent = eventRange
                             conFit(nConRow).Component = {thisComp};
                             conFit(nConRow).Hemisphere = {thisLR};
                             conFit(nConRow).Channels = {theCentChan};
-                            conFit(nConRow).AllTrial = {isCorStr};
+                            conFit(nConRow).AllTrial = {thisRespStr};
                             conFit(nConRow).isFaceSpec = iFaceSpec;
                             conFit(nConRow).Count = output.count;
                             conFit(nConRow).Model = output.model;

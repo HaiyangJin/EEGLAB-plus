@@ -1,4 +1,4 @@
-function [topo_table, gtopo_table] = topodata_plot(epoch_table, gwindowTable, chanInfo, isPlot, figureSize)
+function [topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo, isPlot, figureSize)
 % channel information
 % chanInfo = EEG(1).chanlocs;
 if nargin < 4 || isempty(isPlot)

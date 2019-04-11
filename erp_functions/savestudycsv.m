@@ -47,7 +47,7 @@ if ~isSameChan
     if isunix && ~ismac; close; end
 
     % recreate the topomap
-    [topo_table, gtopo_table] = topodata_plot(epoch_table, gwindowTable, chanInfo);
+    [topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo);
   
 end
 

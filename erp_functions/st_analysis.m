@@ -223,7 +223,7 @@ for iEvent = eventRange
                 % only continue when there are some data in the table 
                 if ~isempty(clusterTrialTable) 
                     
-                    clusterTrialTable.Response = regexp(clusterTrialTable.urResponse, '\d*', 'Match');
+                    clusterTrialTable.Response = cellfun(@(x) regexp(x, '\d*', 'Match'), clusterTrialTable.urResponse);
                     clusterTrialTable.Hemisphere = repmat({thisLR}, size(clusterTrialTable, 1), 1);
                     clusterTrialTable.Component = repmat({thisComp}, size(clusterTrialTable, 1), 1);
 

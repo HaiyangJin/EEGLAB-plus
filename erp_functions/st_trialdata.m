@@ -85,7 +85,7 @@ for iEpoch = 1:nTrial
     if isBlock
         isBlockTemp = ismember(theEvents, blockEvent);
         blockStr = theEvents{isBlockTemp};
-        Block = repmat({blockStr(regexp(blockStr, '\d'))}, nRow, 1);
+        Block = repmat(regexp(blockStr, '\d*', 'match'), nRow, 1);
     else
         Block = repmat({''}, nRow, 1);
     end
@@ -94,7 +94,7 @@ for iEpoch = 1:nTrial
         isRespHere = ismember(theEvents, respEvent);
         if any(isRespHere) % Response
             respStr = theEvents{isRespHere};
-            Response = repmat({respStr(regexp(respStr, '\d'))}, nRow, 1);  % only get the numbers
+            Response = repmat(regexp(respStr, '\d*', 'match'), nRow, 1);  % only get the numbers
             RT = repmat(latency(1, iEpoch), nRow, 1);
         else
             Response = repmat({''}, nRow, 1);

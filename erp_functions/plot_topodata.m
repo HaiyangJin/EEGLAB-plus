@@ -1,4 +1,6 @@
 function [topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo, isPlot, figureSize)
+% for checking the channels for peak amplitudes
+
 % channel information
 % chanInfo = EEG(1).chanlocs;
 if nargin < 4 || isempty(isPlot)

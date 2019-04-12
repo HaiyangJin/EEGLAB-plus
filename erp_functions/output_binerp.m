@@ -1,4 +1,4 @@
-function binerp_table = plot_binerp(binEpochTable, onsetEvents, subjCode, isBasedResp, isWeightedMean)
+function binerp_table = output_binerp(binEpochTable, onsetEvents, subjCode, isBasedResp, isWeightedMean, isCSV)
 % This function aggreagte the epochs for each bin and output the table for
 % plotting ERP (lines) for every conditions
 %
@@ -27,6 +27,10 @@ if nargin < 5 || isempty(isWeightedMean)
     isWeightedMean = 0;
 end
 Weighted = {'Avg', 'Weighted'};
+
+if nargin < 6 || isempty(isCSV)
+    isCSV = 1;
+end
 
 [~, isDataColu] = xposition(binEpochTable.Properties.VariableNames);
 
@@ -85,6 +89,9 @@ DV_table = array2table(DV, 'VariableNames', theTable.Properties.VariableNames(is
 binerp_table = horzcat(IV_table, DV_table);
 
 fn_binerp = ['BinERP_' Resp{isBasedResp + 1} '_' Weighted{isWeightedMean + 1} '.csv'];
-writetable(binerp_table, fn_binerp);
+
+if isCSV
+    writetable(binerp_table, fn_binerp);
+end
 
 end

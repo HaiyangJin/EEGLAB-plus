@@ -79,7 +79,12 @@ for iTrial = 1:max(trialNumber)
     end
     
     if isBlock
-        trial(iTrial).urBlock = theEvents{ismember(theEvents, blockEvent)};
+        isTempBlock = ismember(theEvents, blockEvent);
+        if any(isTempBlock)
+            trial(iTrial).urBlock = theEvents{isTempBlock};
+        else
+            trial(iTrial).urBlock = {''};
+        end
     end
 end
 

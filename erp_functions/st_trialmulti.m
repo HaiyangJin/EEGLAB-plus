@@ -18,7 +18,7 @@ else
 end
 
 if nargin < 2 || isempty(channels)
-    channels = channame(1:128);
+    channels = [];
 else
     channels = channame(channels);
 end

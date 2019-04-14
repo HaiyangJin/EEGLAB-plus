@@ -1,4 +1,4 @@
-function urTrialInfo = st_urtrialinfo(EEG, onsetEvent, respEvent, blockEvent)
+function [urTrialInfo, nOnsetEvent] = st_urtrialinfo(EEG, onsetEvent, respEvent, blockEvent)
 % This function tries to calculate the trial number for the data of each participant.
 % Trial numbers are mainly calculated based on EEG.urevent (The raw event
 % records) and EEG.event.urevent (event records for the remaining epoch)
@@ -41,34 +41,68 @@ rawT = struct2table(EEG.urevent);
 
 rawT.Urevent = (1:size(rawT, 1))';  % add the row number (urevnet) to the table
 rawT.IsOnset = ismember(rawT.type, onsetEvent);
+rawT.IsResp = ismember(rawT.type, respEvent);
 
-% calculate the trial number
+nOnsetEvent = sum(rawT.IsOnset);
+nRespEvent = sum(rawT.IsResp);
+
+same_Onset_Resp = nOnsetEvent == nRespEvent;
+if ~same_Onset_Resp
+    warning(['In the original data set, the number of response events (%d) were not '...
+        'the same as that of onset events (%d).'], nRespEvent, nOnsetEvent);
+end
+        
+% calculate the trial number based on onset events
 nRows = size(rawT, 1);
 trialNumber = zeros(nRows, 0);
 for iRow = 1:nRows
-    trialNumber(iRow, 1) = sum([rawT(1:iRow,:).IsOnset]);
+     trialNumber(iRow, 1) = sum([rawT(1:iRow,:).IsOnset]); 
+end
+clear iRow
+rawT.TrialNumber_Onset = trialNumber;
+
+
+% recheck the trial number if the number of onset and response events are
+% not the same
+if ~same_Onset_Resp
+    for iRow = 1:nRows
+    % there must be one onset event and one response event
+      numResp = sum([rawT(1:iRow,:).IsResp]); 
+      
+      if numResp - trialNumber(iRow, 1) > 0
+          warning('There are no onset events for Trial %d.', numResp);
+          trialNumber(iRow:end, 1) = trialNumber(iRow:end, 1) + 1;
+      end
+    end
 end
 rawT.TrialNumber = trialNumber;
 
 trial = struct;
 for iTrial = 1:max(trialNumber)
-    
     thisTrialT = rawT(iTrial == [rawT.TrialNumber], :); 
     theEvents = thisTrialT.type;
     
     isTempOnset = ismember(theEvents, onsetEvent);
-    trial(iTrial).Urevent = thisTrialT{isTempOnset, 'Urevent'};
-    trial(iTrial).Event = theEvents{isTempOnset};
     trial(iTrial).TrialNumber = iTrial;
+    
+    if sum(isTempOnset)
+        trial(iTrial).Urevent = thisTrialT{isTempOnset, 'Urevent'};
+        trial(iTrial).Event = theEvents{isTempOnset};
+    else
+        trial(iTrial).Urevent = NaN;
+        trial(iTrial).Event = {''};
+    end
     
     if isResp
         isTempResp = ismember(theEvents, respEvent);
         if sum(isTempResp) > 1
+            % only save the first response for this trial
             warning('There are %d response events for this trial %d.', sum(isTempResp), iTrial);
             allresp = find(isTempResp);
             isTempResp = zeros(length(theEvents), 1);
             isTempResp(allresp(1)) = 1;
             isTempResp = logical(isTempResp);
+            % and save another trial with no information
         end
         trial(iTrial).urResponse = theEvents{isTempResp};
         trial(iTrial).urLatency = thisTrialT{isTempResp, 'latency'} - ...

@@ -1,5 +1,5 @@
-function topomovie_table = output_topomovie(expCode, saveData)
-% output the data for plotting topo map or topomovie
+function topovideo_table = output_topovideo(expCode, saveData)
+% output the data for plotting topo map or topo video
 
 if nargin < 2
     saveData = 1;
@@ -27,13 +27,13 @@ Count = splitapply(@(x) size(x, 1), trialTable.P0, G);
 IV_table = table(Channel, Event, urResponse, SubjCode, Count);
 DV_table = array2table(DV, 'VariableNames', trialTable.Properties.VariableNames(isDataColu));
 
-topomovie_table = [IV_table, DV_table];
-disp('Topo movie data are calculated successfully!');
+topovideo_table = [IV_table, DV_table];
+disp('Topo video data are calculated successfully!');
 
 if saveData
-    fn_topomovie = [expCode, '_TopoMovieTable'];
-    save(fn_topomovie, 'topomovie_table');
-    disp('Topo movie data are saved successfully!');
+    fn_topovideo = [expCode, '_TopoVideoTable'];
+    save(fn_topovideo, 'topovideo_table');
+    disp('Topo video data are saved successfully!');
 end
 
 end

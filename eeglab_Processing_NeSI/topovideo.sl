@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread    # don't use hyperthreading  -Xmx2g
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --output=Topomovie_%j.out # Include the job ID in the names of
+#SBATCH --output=Topovideo_%j.out # Include the job ID in the names of
 #SBATCH --array=5  # Array definition [1:5, exp code]  2 3 4 5
 module load MATLAB/2017b
-srun matlab -nodesktop -nosplash -r topomovie
+srun matlab -nodesktop -nosplash -r topovideo

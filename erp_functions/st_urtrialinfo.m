@@ -64,6 +64,8 @@ rawT.TrialNumber_Onset = trialNumber;
 
 % recheck the trial number if the number of onset and response events are
 % not the same
+unitSample = 1000 ./ EEG.srate;
+
 if ~same_Onset_Resp
     for iRow = 1:nRows
     % there must be one onset event and one response event
@@ -105,10 +107,13 @@ for iTrial = 1:max(trialNumber)
             % and save another trial with no information
         end
         trial(iTrial).urResponse = theEvents{isTempResp};
+        
+        if sum(isTempOnset)
         trial(iTrial).urLatency = thisTrialT{isTempResp, 'latency'} - ...
             thisTrialT{isTempOnset, 'latency'};
-        
-        unitSample = 1000 ./ EEG.srate;
+        else
+            trial(iTrial).urLatency = NaN;
+        end
         trial(iTrial).urRT = trial(iTrial).urLatency * unitSample;
     end
     

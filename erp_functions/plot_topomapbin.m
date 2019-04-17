@@ -1,9 +1,14 @@
-function plot_topomapbin(topovideo_table, timeWindow, isBasedResp)
+function plot_topomapbin(topovideo_table, timeWindow, eventCode, isBasedResp)
 
 if nargin < 2 
     timeWindow = [];
 end
-if nargin < 3 || isempty(isBasedResp)
+events = unique(topovideo_table.Event);
+nEvent = length(events);
+if nargin < 3 || isempty(eventCode)
+    eventCode = 1:nEvent;
+end
+if nargin < 4 || isempty(isBasedResp)
     isBasedResp = 0;
 end
     
@@ -11,15 +16,13 @@ end
 dataNames = topovideo_table.Properties.VariableNames(isDataColu);
 
 %% Save the topo map for each condition
-events = unique(topovideo_table.Event);
-nEvent = length(events);
 
 if isBasedResp
     resp = unique(topovideo_table.urResponse);
     nResp = length(resp);
 end
 
-for iEvent = 1:nEvent
+for iEvent = eventCode
     thisEvent = events{iEvent};
     if ~exist(thisEvent, 'dir'); mkdir(thisEvent); end
     

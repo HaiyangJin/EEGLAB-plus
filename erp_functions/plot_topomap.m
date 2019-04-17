@@ -1,6 +1,6 @@
 function plot_topomap(topodata_table, foldername, timeWindow, lagForVideo, locfile)
 % Plot the topo map separately or for further creating topo Video
-ampLimits = [-4 4];
+ampLimits = [-5 5];
 
 variableNames = topodata_table.Properties.VariableNames;
 [~, isDataColu, lag] = xposition(variableNames);

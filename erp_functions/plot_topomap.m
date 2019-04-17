@@ -53,4 +53,6 @@ for iFrame = frames
 	close(f);  % close current figure
 end
 
+fprintf('Save %d frame topo maps successfully!\n', length(frames));
+
 end

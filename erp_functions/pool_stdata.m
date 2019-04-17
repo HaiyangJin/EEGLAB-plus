@@ -32,7 +32,7 @@ if isBinFile
     
     % save the erp data
     output_binerp(bintable, [], [], 0, 0, fn_outPre);
-    output_binerp(bintable, [], [], 1, 0, fn_outPre);
+    output_binerp(bintable, [], [], 1, 0, fn_outPre);  % different response
     fprintf('Bin epoch data are saved successfully for %s!\n', fn_outPre);
 end
 

@@ -8,14 +8,13 @@ ID = getenv('SLURM_ARRAY_TASK_ID');
 eeglab;
 
 % the study folder
-expCode = ['20' ID(1)];
+expCode = ['20' ID(end-2)];
 % windowPlot = [];
+onsetCode = str2double(ID(end-1:end));
 if length(ID) <= 3
-    onsetCode = str2double(ID(2:end));
     respCode = [];
-elseif length(ID) == 5
-    onsetCode = str2double(ID(2:3));
-    respCode = str2double(ID(4:5));
+elseif length(ID) <= 5
+    respCode = str2double(ID(1:end-3));
 end
 
 

@@ -21,7 +21,7 @@ if isunix && ~ismac
     if length(ID) ~= 4
         error('There should be four digitals for the array!!!')
     else
-        is2_17Block = 0;
+        is2Block = 0;
         expCode = ID(2);    % the number of experiment
         folderInfoNum = ID(1);
         switch folderInfoNum
@@ -44,7 +44,7 @@ if isunix && ~ismac
                 basedAcc = 3; % scramAcc
                 isIndividual = 2; % group
             case '9'
-                is2_17Block = 1; % test the diff for two normal face 17ms condition (face specific)
+                is2Block = 1; % test the diff for two normal face 17ms condition (face specific)
                 basedAcc = 3; % scramCor
                 isIndividual = 1; % individual
         end
@@ -86,7 +86,7 @@ isIndividualFolder = indiInfoFolder{isIndividual};
 accInfoFolder = {'All', 'Cor', 'Scr'};
 isBasedAccFolder = accInfoFolder{basedAcc};
 
-if is2_17Block
+if is2Block
     folderInfo = 'Normal_17_Compare';
 else
     folderInfo = [isIndividualFolder, '_', isBasedAccFolder];
@@ -125,7 +125,7 @@ elseif strcmp(expCode, '4')
 %     end
 elseif strcmp(expCode, '5')
 %     if basedAcc == 1
-        subjCodes = 1:8; 
+        subjCodes = 1:35; 
 %     else
 %         subjCodes = [1:3]; %#ok<NBRAK>
 %     end

@@ -9,6 +9,6 @@
 #SBATCH --hint=nomultithread    # don't use hyperthreading
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --array=9500 # Array definition 9500 ([3]Individual(1), scrambled acc(3) and participant numbers)
+#SBATCH --array=9500-9535 # Array definition 9500 ([3]Individual(1), scrambled acc(3) and participant numbers)
 module load MATLAB/2017b
 srun matlab -nodesktop -nosplash -r EEGlab_120_PreProcessed_v3 $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

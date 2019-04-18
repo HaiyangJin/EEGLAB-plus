@@ -93,9 +93,9 @@ if toSaveFigure
         mkdir(subjFitFolder);
     end
     
-    conFitFolder = [paraCode '_ST_ConFit' filesep];
-    if ~exist(conFitFolder, 'dir')
-        mkdir(conFitFolder);
+    binFitFolder = [paraCode '_ST_BinFit' filesep];
+    if ~exist(binFitFolder, 'dir')
+        mkdir(binFitFolder);
     end
 end
 
@@ -161,8 +161,8 @@ respStr = horzcat('all', cellfun(@(x) ['RESP' x], respCode(2:end), 'UniformOutpu
 if isCluster; clusterStr = 'Cluster'; else clusterStr = 'SingleChannel'; end %#ok<SEPEX>
 subjFit = struct;
 nSubRow = 0;
-conFit = struct;
-nConRow = 0;
+binFit = struct;
+nBinRow = 0;
 
 switch length(partCode)
     case 1
@@ -248,15 +248,15 @@ for iEvent = eventRange
                     end
                     
                     if isDistAna
-                        %% fit ex-gaussian function for every subject
+                        %% fit ex-gaussian function for every subject (for every bin)
                         %%%%% fit exGaussian and save the parameters %%%%%
                         
                         %%%%% for every participant with loop %%%%%
-                        subjCond = unique(trialMeanAmp.SubjCode);  % subject codes in this condition
-                        nSubjCond = length(subjCond);
+                        subjBin = unique(trialMeanAmp.SubjCode);  % subject codes in this condition
+                        nSubjBin = length(subjBin);
                         
-                        for iSubj = 1:nSubjCond
-                            thisSubj = subjCond{iSubj};
+                        for iSubj = 1:nSubjBin
+                            thisSubj = subjBin{iSubj};
                             
                             isSubj = strcmp(trialMeanAmp.SubjCode, thisSubj);
                             subjData = trialMeanAmp{isSubj, 'MeanAmp'};
@@ -323,11 +323,11 @@ for iEvent = eventRange
                             
                         end
                         
-                        clear subjCond
-                        clear nSubjCond
+                        clear subjBin
+                        clear nSubjBin
                         clear thisSubj
                         
-                        %% fit the ex-guassian distribution for every condition
+                        %% fit the ex-guassian distribution for every bin (across subjects)
                         
                         % calculate the face specific peak
                         isFaceEvent = thisEvent(2) == 'F';
@@ -426,34 +426,34 @@ for iEvent = eventRange
                                 title(disTitle)
                                 if toSaveFigure
                                     %                             saveas(fitfig, [conFitFolder 'Distribution-', disTitle '.jpg']);
-                                    print([conFitFolder 'Distribution-', disTitle], '-dpng', '-r300');  % '-dtiffn'
+                                    print([binFitFolder 'Distribution-', disTitle], '-dpng', '-r300');  % '-dtiffn'
                                 end
                             end
                             
-                            nConRow = nConRow + 1;
-                            conFit(nConRow).Event = {thisEvent};
-                            conFit(nConRow).Component = {thisComp};
-                            conFit(nConRow).Hemisphere = {thisLR};
-                            conFit(nConRow).Channels = {theCentChan};
-                            conFit(nConRow).AllTrial = {thisRespStr};
-                            conFit(nConRow).isFaceSpec = iFaceSpec;
-                            conFit(nConRow).Count = output.count;
-                            conFit(nConRow).Model = output.model;
-                            conFit(nConRow).mu = mu;
-                            conFit(nConRow).sigma = sigma;
-                            conFit(nConRow).tau = tau;
-                            conFit(nConRow).Iterations = output.iterations;
-                            conFit(nConRow).funcCount = output.funcCount;
-                            conFit(nConRow).Algorithm = output.algorithm;
-                            conFit(nConRow).Message = {output.message};
-                            conFit(nConRow).isDenoise = isDenoise;
+                            nBinRow = nBinRow + 1;
+                            binFit(nBinRow).Event = {thisEvent};
+                            binFit(nBinRow).Component = {thisComp};
+                            binFit(nBinRow).Hemisphere = {thisLR};
+                            binFit(nBinRow).Channels = {theCentChan};
+                            binFit(nBinRow).AllTrial = {thisRespStr};
+                            binFit(nBinRow).isFaceSpec = iFaceSpec;
+                            binFit(nBinRow).Count = output.count;
+                            binFit(nBinRow).Model = output.model;
+                            binFit(nBinRow).mu = mu;
+                            binFit(nBinRow).sigma = sigma;
+                            binFit(nBinRow).tau = tau;
+                            binFit(nBinRow).Iterations = output.iterations;
+                            binFit(nBinRow).funcCount = output.funcCount;
+                            binFit(nBinRow).Algorithm = output.algorithm;
+                            binFit(nBinRow).Message = {output.message};
+                            binFit(nBinRow).isDenoise = isDenoise;
                             
-                            conFit(nSubRow).isAd = output.isAd;
-                            conFit(nSubRow).AdP = output.AdP;
-                            conFit(nSubRow).isJb = output.isJb;
-                            conFit(nSubRow).JbP = output.JbP;
-                            conFit(nSubRow).isL = output.isL;
-                            conFit(nSubRow).LP = output.LP;
+                            binFit(nSubRow).isAd = output.isAd;
+                            binFit(nSubRow).AdP = output.AdP;
+                            binFit(nSubRow).isJb = output.isJb;
+                            binFit(nSubRow).JbP = output.JbP;
+                            binFit(nSubRow).isL = output.isL;
+                            binFit(nSubRow).LP = output.LP;
                         end
                     end
                 end
@@ -466,15 +466,15 @@ end
 %% save the exgaussian output table
 if isDistAna
     subjFitTable = struct2table(subjFit);
-    conFitTable = struct2table(conFit);
-    save([studyPath expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'conFitTable', 'partCode', 'paraCode');
+    binFitTable = struct2table(binFit);
+    save([studyPath expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'binFitTable', 'partCode', 'paraCode');
     
     % save the file as *.csv
     if ispc || ismac
         subjFitTable = subjFitTable(:, 1:end-1);
-        conFitTable = conFitTable(:, 1:end-1);
+        binFitTable = binFitTable(:, 1:end-1);
         writetable(subjFitTable, [partCode '_Subj_Output.csv']);
-        writetable(conFitTable, [partCode '_ConFitTable.csv']);
+        writetable(binFitTable, [partCode '_BinFitTable.csv']);
     end
 end
 

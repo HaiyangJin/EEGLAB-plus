@@ -1,28 +1,39 @@
-function plot_topomapbin(topovideo_table, timeWindow, eventCode, isBasedResp)
+function plot_topomapbin(topovideo_table, onsetCode, respCode, timeWindow)
+% save the topo map for the onset events (with response events)
+% topovideo_table: the output from output_topovideo
+% onsetCode: (double)
+% respCode: (double)
+% timeWindow: [double, double]
 
-if nargin < 2 
-    timeWindow = [];
-end
 events = unique(topovideo_table.Event);
 nEvent = length(events);
-if nargin < 3 || isempty(eventCode)
-    eventCode = 1:nEvent;
+if nargin < 2 || isempty(onsetCode)
+    onsetCode = 1:nEvent;
 end
-if nargin < 4 || isempty(isBasedResp)
-    isBasedResp = 0;
+if nargin < 3
+    respCode = [];
 end
-    
+isBasedResp = ~isempty(respCode);
+if nargin < 4 
+    timeWindow = [];
+end
+
 [~, isDataColu] = xposition(topovideo_table.Properties.VariableNames);
 dataNames = topovideo_table.Properties.VariableNames(isDataColu);
 
 %% Save the topo map for each condition
 
 if isBasedResp
-    resp = unique(topovideo_table.urResponse);
-    nResp = length(resp);
+    responses = unique(topovideo_table.urResponse);
+    nResp = length(responses);
+    isEvent = respCode > nResp;
+    if sum(isEvent)
+        error('There is no corresponding response event for respCode %d.\n',...
+            respCode(isEvent));
+    end
 end
 
-for iEvent = eventCode
+for iEvent = onsetCode
     thisEvent = events{iEvent};
     if ~exist(thisEvent, 'dir'); mkdir(thisEvent); end
     
@@ -30,8 +41,8 @@ for iEvent = eventCode
     
     if isBasedResp
         % if based on responses
-        for iResp = 1:nResp
-            thisResp = resp{iResp};
+        for iResp = respCode
+            thisResp = responses{iResp};
                         
             respTable = thisEventTable(strcmp(thisEventTable.urResponse, thisResp), :);
             

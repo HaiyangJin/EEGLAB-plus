@@ -45,7 +45,7 @@ for iFrame = frames
     title([num2str(iFrame), ' ms'], 'FontSize', 18);
 
     frameName = xconverter(iFrame);
-    thisFn = [foldername, filesep, sprintf([foldername '_%s.png'], frameName{1})];
+    thisFn = [foldername, filesep, sprintf([strrep(foldername, filesep, '_') '_%s.png'], frameName{1})];
 	print(thisFn, '-dpng'); %save as png
     
     png_trans(thisFn, 1); % resave the image with transparent background

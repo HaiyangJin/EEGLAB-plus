@@ -330,6 +330,7 @@ for iEvent = eventRange
                         %% fit the ex-guassian distribution for every bin (across subjects)
                         
                         % calculate the face specific peak
+                        disOutput = 0;
                         isFaceEvent = thisEvent(2) == 'F';
                         if isFaceEvent
                             subjCodeFace = unique(trialMeanAmp.SubjCode);
@@ -339,40 +340,41 @@ for iEvent = eventRange
                                 plotWindow, theHouseEvent, thisResp, [], [], isCluster);
                             close(tempImage);
                             
-                            clsuterHousePeak = st_meanamp(clusterHosueData, tw, thisComp);
-                            %                     clsuterHousePeak = erp_peakoutput(clusterHosueData, timeWindow, 1);
-                            
-                            [G, SubjCodeHouse] = findgroups(clsuterHousePeak.SubjCode);
-                            Amplitude = splitapply(@mean, clsuterHousePeak.MeanAmp, G);
-                            thisHouseTable = table(SubjCodeHouse, Amplitude);
-                            
-                            fprintf('The number of participants in this condition is %d.\n', length(subjCodeFace));
-                            faceSpecPeak = table;
-                            for iSubj = 1:length(subjCodeFace)
-                                thisSubjFace = subjCodeFace{iSubj};
+                            if ~isempty(clusterHosueData)
                                 
-                                thisFaceSpecPeak = trialMeanAmp(strcmp(trialMeanAmp.SubjCode, thisSubjFace), :);
+                                clsuterHousePeak = st_meanamp(clusterHosueData, tw, thisComp);
+                                %                     clsuterHousePeak = erp_peakoutput(clusterHosueData, timeWindow, 1);
                                 
-                                if ismember(thisSubjFace, SubjCodeHouse)
-                                    houseAmp = thisHouseTable{strcmp(thisHouseTable.SubjCodeHouse, thisSubjFace), 2};
-                                else
-                                    houseAmp = 0;
+                                [G, SubjCodeHouse] = findgroups(clsuterHousePeak.SubjCode);
+                                Amplitude = splitapply(@mean, clsuterHousePeak.MeanAmp, G);
+                                thisHouseTable = table(SubjCodeHouse, Amplitude);
+                                
+                                fprintf('The number of participants in this condition is %d.\n', length(subjCodeFace));
+                                faceSpecPeak = table;
+                                for iSubj = 1:length(subjCodeFace)
+                                    thisSubjFace = subjCodeFace{iSubj};
+                                    
+                                    thisFaceSpecPeak = trialMeanAmp(strcmp(trialMeanAmp.SubjCode, thisSubjFace), :);
+                                    
+                                    if ismember(thisSubjFace, SubjCodeHouse)
+                                        houseAmp = thisHouseTable{strcmp(thisHouseTable.SubjCodeHouse, thisSubjFace), 2};
+                                    else
+                                        houseAmp = 0;
+                                    end
+                                    
+                                    thisFaceSpecPeak.faceSpecMeanAmp = thisFaceSpecPeak.MeanAmp ...
+                                        - houseAmp;
+                                    
+                                    faceSpecPeak = vertcat(faceSpecPeak, thisFaceSpecPeak); %#ok<AGROW>
+                                    
+                                    if size(faceSpecPeak, 1) > size(trialMeanAmp, 1)
+                                        warning('Something is wrong with faceSpecPeak');
+                                    end
+                                    
                                 end
                                 
-                                thisFaceSpecPeak.faceSpecMeanAmp = thisFaceSpecPeak.MeanAmp ...
-                                    - houseAmp;
-                                
-                                faceSpecPeak = vertcat(faceSpecPeak, thisFaceSpecPeak); %#ok<AGROW>
-                                
-                                if size(faceSpecPeak, 1) > size(trialMeanAmp, 1)
-                                    warning('Something is wrong with faceSpecPeak');
-                                end
-                                
+                                disOutput = [0, 1];
                             end
-                            
-                            disOutput = [0, 1];
-                        else
-                            disOutput = 0;
                         end
                         
                         if isDenoise

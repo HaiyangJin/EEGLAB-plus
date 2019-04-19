@@ -42,10 +42,12 @@ for iFrame = frames
     f=figure; topoplot(thisFrameData, locfile, ...
         'maplimits', ampLimits,...
         'electrodes', 'off');
-    title([num2str(iFrame), ' ms'], 'FontSize', 18);
+    title(sprintf([num2str(iFrame), 'ms [%s_ %s]'], num2str(ampLimits(1)), ...
+        num2str(ampLimits(2))), 'FontSize', 18);
 
     frameName = xconverter(iFrame);
-    thisFn = [foldername, filesep, sprintf([strrep(foldername, filesep, '_') '_%s.png'], frameName{1})];
+    thisFn = [foldername, filesep, sprintf([strrep(foldername, filesep, '_') ...
+        '_%s.png'], frameName{1})];
 	print(thisFn, '-dpng'); %save as png
     
     png_trans(thisFn, 1); % resave the image with transparent background

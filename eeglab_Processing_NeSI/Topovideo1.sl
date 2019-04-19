@@ -12,4 +12,4 @@
 #SBATCH --output=Topovideo1_%j.out # Include the job ID in the names of
 #SBATCH --array=2-4  # Array definition [1:5, exp code]  2 3 4 5
 module load MATLAB/2017b
-srun matlab -nodesktop -nosplash -r Topovideo_1
+srun matlab -nodesktop -nosplash -r Topovideo1

@@ -12,4 +12,4 @@
 #SBATCH --output=Topovideo2_%A_%a.out # Include the job ID in the names of  1501-1508,2501-2508,3501-3508,4501-4508,
 #SBATCH --array=1401-1408,2401-2408  # Array definition [1:5, exp code]  ID should be 201-216,301-316,401-408,501-508,1401-1408,2401-2408,
 module load MATLAB/2017b
-srun matlab -nodesktop -nosplash -r Topovideo_2
+srun matlab -nodesktop -nosplash -r Topovideo2

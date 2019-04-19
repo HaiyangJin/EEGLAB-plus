@@ -448,12 +448,12 @@ for iEvent = eventRange
                             binFit(nBinRow).Message = {output.message};
                             binFit(nBinRow).isDenoise = isDenoise;
                             
-                            binFit(nSubRow).isAd = output.isAd;
-                            binFit(nSubRow).AdP = output.AdP;
-                            binFit(nSubRow).isJb = output.isJb;
-                            binFit(nSubRow).JbP = output.JbP;
-                            binFit(nSubRow).isL = output.isL;
-                            binFit(nSubRow).LP = output.LP;
+                            binFit(nBinRow).isAd = output.isAd;
+                            binFit(nBinRow).AdP = output.AdP;
+                            binFit(nBinRow).isJb = output.isJb;
+                            binFit(nBinRow).JbP = output.JbP;
+                            binFit(nBinRow).isL = output.isL;
+                            binFit(nBinRow).LP = output.LP;
                         end
                     end
                 end

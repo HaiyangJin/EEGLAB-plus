@@ -9,7 +9,7 @@ eeglab;
 
 % the study folder
 expCode = ['20' ID(1)];
-partCode = ID(end);
+partCode = ID(2:end);
 
 parameters.isCluster = 1;
 parameters.isgwindow = 1;
@@ -19,8 +19,14 @@ parameters.plotWindow = [-200 996];
 
 saveAmpData = 1;
 saveBinEpoch = 1;
-isDistAna = 0;
-toSaveFigure = 0;
+isDistAna = 1;  
+toSaveFigure = 1;
+
+% % Don't fit with ex-Gaussian and don't save image (faster)
+% isDistAna = 0;  % 
+% toSaveFigure = 0;
+
+
 
 
 %% Conduct the single trial analysis

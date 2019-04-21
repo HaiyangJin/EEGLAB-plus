@@ -120,7 +120,7 @@ rawTrialTable = st_trialmulti('.', channels); %
 % correct the RT, as there is a offset of about 33ms (comparing with
 % E-prime results)
 rawTrialTable.RTBackup = rawTrialTable.RT;
-rawTrialTable.RT = rawTrialTable.urRT + 33;
+rawTrialTable.RT = rawTrialTable.urRT + 33 - 50;
 
 if isDenoise
     fprintf('\nPreparing for denoising the raw trial erp data...\n');

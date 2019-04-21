@@ -56,7 +56,7 @@ if isAmpFile
         path_beha = ['..' filesep '01_Behavior' filesep];
         this_fn_beha = dir([path_beha fn_behavior]);
         behavior_table = readtable([path_beha this_fn_beha.name]);
-        amptable = pool_stmeanamp_stimuli(amptable, behavior_table);
+        amptable = join_stmeanamp_stimuli(amptable, behavior_table);
     end
     
     % Save csv

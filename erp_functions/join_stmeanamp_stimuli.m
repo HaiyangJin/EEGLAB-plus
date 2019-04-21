@@ -1,4 +1,4 @@
-function joint_table = pool_stmeanamp_stimuli(ST_table, behavior_table)
+function joint_table = join_stmeanamp_stimuli(ST_table, behavior_table)
 % behavior_table should include a column called trialNum
 
 %% Preprocesse the behavior data

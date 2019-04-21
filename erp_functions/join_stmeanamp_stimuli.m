@@ -1,5 +1,9 @@
-function joint_table = join_stmeanamp_stimuli(ST_table, behavior_table)
+function joint_table = join_stmeanamp_stimuli(ST_table, behavior_table, stimOnly)
 % behavior_table should include a column called trialNum
+
+if nargin < 3 || isempty(stimOnly)
+    stimOnly = 1;
+end
 
 %% Preprocesse the behavior data
 % remove data for practice trials
@@ -28,6 +32,11 @@ for iSubj = 1 : length(totalTrialNum)
     trialNum = [trialNum; thistrialnum]; %#ok<AGROW>
 end
 beha_table.TrialNumber = trialNum;
+
+if stimOnly
+    beha_table = beha_table(:, {'SubjCode', 'TrialNumber', 'Session', 'Block', 'Trial', ...
+        'Resp_ACC', 'Resp_OnsetDelay', 'Resp_RT', 'stimName'});
+end
 
 
 %% Link the mean amplitude and behavior data

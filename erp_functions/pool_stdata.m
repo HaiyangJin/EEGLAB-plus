@@ -1,4 +1,4 @@
-function pool_stdata(filepath, fn_outPre)
+function pool_stdata(filepath, fn_outPre, fn_behavior)
 
 if nargin < 1 || isempty(filepath)
     filepath = uigetdir(pwd, 'Please select the path where the single trial data are stored.');
@@ -14,10 +14,15 @@ isAmpFile = ~isempty(ampFiles);
 
 if nargin < 2 || isempty(fn_outPre)
     if isBinFile
-        fn_outPre = binFiles(1).name(1:3); % expCode
+        fn_outPre = ['E' binFiles(1).name(1:3)]; % expCode
     else
-        fn_outPre = ampFiles(1).name(1:3); % expCode
+        fn_outPre = ['E' ampFiles(1).name(1:3)]; % expCode
     end
+end
+if nargin < 3 || isempty(fn_behavior)
+    isStim = 0;
+else
+    isStim = 1;
 end
 
 %% Process bin erp files
@@ -45,6 +50,13 @@ if isAmpFile
         load(ampFiles(iAmp).name);
         amptable = [amptable; ST_MeanAmpTable]; %#ok<AGROW>
         clear ST_MeanAmpTable
+    end
+    
+    if isStim % combine meanamp table with the behavioral (stimuli) table
+        path_beha = ['..' filesep '01_Behavior' filesep];
+        this_fn_beha = dir([path_beha fn_behavior]);
+        behavior_table = readtable([path_beha this_fn_beha.name]);
+        amptable = pool_stmeanamp_stimuli(amptable, behavior_table);
     end
     
     % Save csv

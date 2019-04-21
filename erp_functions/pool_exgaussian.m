@@ -10,7 +10,7 @@ end
 egFiles = dir('*exGaussian_Output.mat');
 
 if nargin < 2 || isempty(fn_outPre)
-    fn_outPre = egFiles(1).name(1:3); % expCode
+    fn_outPre = ['E' egFiles(1).name(1:3)]; % expCode
 end
 
 

@@ -88,8 +88,17 @@ DV_table = array2table(DV, 'VariableNames', theTable.Properties.VariableNames(is
 
 binerp_table = horzcat(IV_table, DV_table);
 
+% save the column names to the first row
+coluNames_binerp = binerp_table.Properties.VariableNames;
+[~, isDataColu] = xposition(coluNames_binerp);
+coluNames = cell(1, length(isDataColu));
+coluNames(1, ~isDataColu) = coluNames_binerp(~isDataColu);
+coluNames(1, isDataColu) = num2cell(xconverter(coluNames_binerp(isDataColu)));
+
+binerp_table = [coluNames; binerp_table];
+
 fn_binerp = [fn_outPre '_BinERP_' Resp{isBasedResp + 1} '_' Weighted{isWeightedMean + 1} '.csv'];
 
-writetable(binerp_table, fn_binerp);
+writetable(binerp_table, fn_binerp, 'WriteVariableNames', false);
 
 end

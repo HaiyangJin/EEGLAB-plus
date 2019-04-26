@@ -183,19 +183,19 @@ for iFile = 1:nFiles
     %         'epochinfo', 'yes');
     %
     %%%% 115 Reject +-500
-    EEG = pop_eegthresh(EEG,1, 1:128 ,-500, 500, epochStart, epochEnd,0,1);
-    [ALLEEG, EEG , ~] = pop_newset(ALLEEG, EEG, 1,'overwrite','on','gui','off');
+    EEG = pop_eegthresh(EEG,1, 1:128 ,-500, 500, epochStart, epochEnd,1,0);
+%     [ALLEEG, EEG , ~] = pop_newset(ALLEEG, EEG, 1,'overwrite','on','gui','off');
     
     %%%% 116 Reject improbable data
-    EEG = pop_jointprob(EEG,1, 1:128, 6, 2, 1, 1);
-    [~, EEG , ~] = pop_newset(ALLEEG, EEG, 1,'overwrite','on','gui','off');
+    EEG = pop_jointprob(EEG,1, 1:128, 6, 2, 1, 0);
+%     [~, EEG , ~] = pop_newset(ALLEEG, EEG, 1,'overwrite','on','gui','off');
     
     %%%% Throw out stuff that ICA shouldn't fix
     % stillBads = markBadEpochs(75,32,1,400,1,1000,EEG);
     % EEG = pop_rejepoch( EEG, stillBads, 0);
     
     %%%% 117 Baseline correction
-    EEG = pop_rmbase( EEG, [epochStart*1000 0]);
+    EEG = pop_rmbase(EEG, [epochStart*1000 0]);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%% work on the labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -10,12 +10,16 @@ end
 behavior_table = behavior_table(~isnan(behavior_table.durationID), :);
 behavior_table.SubjCode = arrayfun(@(x) ['P' num2str(x)], behavior_table.Subject, 'UniformOutput', false);
 
-tmpSubj = behavior_table{1, 'Subject'};
-if strcmp(tmpSubj(1), '4') % Recording erruptted for two participants (restarted later).
+tmpSubj = num2str(behavior_table{1, 'Subject'});
+expCode = tmpSubj(1);
+if strcmp(expCode, '4') % Recording erruptted for two participants (restarted later).
     isBad426 = (behavior_table.Subject == 426) & (behavior_table.Block == 6);
     isBad428 = (behavior_table.Subject == 428) & behavior_table.Session == 2 & strcmp(behavior_table.scrambleVar, 'S');
     
     behavior_table = behavior_table(~(isBad426 | isBad428), :);
+elseif strcmp(expCode, '5')
+    isBad = behavior_table.Subject == 500;
+    behavior_table = behavior_table(~isBad, :);
 end
 
 % reorder the behavioral table (with trial number (order))
@@ -34,8 +38,15 @@ end
 beha_table.TrialNumber = trialNum;
 
 if stimOnly
-    beha_table = beha_table(:, {'SubjCode', 'TrialNumber', 'Session', 'Block', 'Trial', ...
-        'Resp_ACC', 'Resp_OnsetDelay', 'Resp_RT', 'stimName'});
+    coluNames = {'SubjCode', 'TrialNumber', 'Session', 'Block', 'Trial', ...
+        'Resp_ACC', 'Resp_OnsetDelay', 'Resp_RT', 'stimName'};
+    if strcmp(expCode, '5')
+        beha_table = beha_table(:, {'SubjCode', 'TrialNumber', 'Session', 'Block', 'Trial', ...
+            'Resp_ACC_Trial_', 'Resp_OnsetDelay_Trial_', 'Resp_RT_Trial_', 'stimName_Trial_'});
+        beha_table.Properties.VariableNames = coluNames;
+    else
+        beha_table = beha_table(:, coluNames);
+    end
 end
 
 

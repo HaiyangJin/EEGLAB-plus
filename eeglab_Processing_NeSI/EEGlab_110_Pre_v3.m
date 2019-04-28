@@ -31,7 +31,6 @@ end
 %% input info
 epochStart = -0.5;
 epochEnd = 1;
-isHighFilter1 = 1;  % if the high filter frequency is 1 Hz, 
 addpath(['.', filesep, 'Common_Functions']);
 
 %% 100 Preparation %%% changes needed for new user %%%
@@ -40,15 +39,15 @@ ID = getenv('SLURM_ARRAY_TASK_ID');
 subjCode = ['P' ID];
 
 % get the experimentNum
-experimentNum = ID(1);
-disp(experimentNum);
+expCode = ID(1);
+disp(expCode);
 
 % Preparation for cluster 
 Mahuika;
 
 % Paths where data will be saved
 dt = datestr(now,'yymmddHH'); 
-expFolder = ['20' experimentNum];  % pilot,201,202  the name of the folder that save the data for one experiment
+expFolder = ['20' expCode];  % pilot,201,202  the name of the folder that save the data for one experiment
 expFolderPath = [projectPath,expFolder,filesep];  % where the raw data are saved
 outputPath = [expFolderPath, dt(1:6), filesep]; % where the output will be saved
 if ~exist('outputPath', 'dir')
@@ -66,8 +65,8 @@ ICAWeightName = strcat(subjCode, '_ICAWeight_',dt);
 oneRawFile = strcmp(subjCode, 'P209') || strcmp(subjCode, 'P211')...
     || strcmp(subjCode, 'P301') || strcmp(subjCode, 'P304')...
     || strcmp(subjCode, 'P311')...
-    || strcmp(experimentNum, '4') ...
-    || strcmp(experimentNum, '5');
+    || strcmp(expCode, '4') ...
+    || strcmp(expCode, '5');
 
 appendNeeded = 0;
 if strcmp(subjCode, 'P426') || strcmp(subjCode, 'P428') ...
@@ -78,8 +77,12 @@ end
 %% PREPROCESSING %%
 % high frequency filter for the two rounds data 
 highFilter = [1, 0.1];
+nFilter = length(highFilter);
+if ~ismember(nFilter, [1 2])
+    error('Please check the filter setting for ICA!');
+end
 
-for iProcess = 1:(2-isHighFilter1)
+for iProcess = 1:nFilter
     %%%%%%% iProcess = 1  %%%%%%%%%%%
     % get the ICA weight for the 1Hz high filtered data
     
@@ -107,18 +110,27 @@ for iProcess = 1:(2-isHighFilter1)
     EEG = pop_saveset(EEG, 'filename',rawFilename,'filepath',expFolderPath); % save the raw data as backup
     
     %%%% 102 Change time point
-    EEG = correctTriggerLatency(EEG, 50);
+    allevents = {EEG.event.type};
+    switch expCode
+        case '2' || '3'
+            screenEvents = cellfun(@(x) ismember(x(4), {'+', '-'}), allevents);
+        case '4' || '5'
+            screenEvents = cellfun(@(x) strcmp(x(4), '+') || strcmp(x(1:3), 'blo'), allevents);
+    end
+    EEG = correctEventDelay(EEG, 50, screenEvents);
     
     %%%% 103 Re-sample to 250 Hz
     EEG = pop_resample(EEG, 250);
     
     %%%% 104 Filter the data between 1-Hz (high) and 50 Hz (low)
-    EEG  = pop_basicfilter( EEG,  1:128 , 'Cutoff', [highFilter(iProcess) 50], ...
+    EEG  = pop_basicfilter(EEG,  1:EEG.nbchan, 'Cutoff', [highFilter(iProcess) 50], ...
         'Design', 'butter', 'Filter', 'bandpass', 'Order',  4, 'RemoveDC', 'on' );
     
     %%%% 105 Import channel info
     EEG = pop_chanedit(EEG, 'load',{strcat(projectPath,'Common_Functions', filesep, 'GSN-HydroCel-129.sfp') 'filetype' 'autodetect'},...
         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
+%     EEG = pop_chanedit(EEG, 'load',{'GSN-HydroCel-129.sfp' 'filetype' 'autodetect'},...
+%         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
     
     %%%% 106 Remove line noise using CleanLine
     EEG = pop_cleanline(EEG, 'bandwidth', 2,'chanlist', 1:EEG.nbchan, ...
@@ -128,7 +140,7 @@ for iProcess = 1:(2-isHighFilter1)
     
     %%%% 107 Remove bad channels
     chanStruct = EEG.chanlocs;
-    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
+    [EEG, BUR] = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
     
     %%%% 108 Interpolate all the removed channels
     EEG = pop_interp(EEG,chanStruct,'Spherical');
@@ -188,12 +200,12 @@ EEG = pop_multifit(EEG, 1:EEG.nbchan,'threshold', 100, 'dipplot','off','plotopt'
 EEG = fitTwoDipoles(EEG, 'LRR', 35);
 
 %%%% 114 epoch data
-if strcmp(experimentNum, '1')
+if strcmp(expCode, '1')
     events_epoch = {'F017' 'F050'  'F100'  'F200'  'H017'  'H050'  'H100'  'H200'};
-elseif strcmp(experimentNum, '2') || strcmp(experimentNum, '3')
+elseif strcmp(expCode, '2') || strcmp(expCode, '3')
     events_epoch = {'NF7+'  'NF5+'  'NF1+'  'NF2+'  'NH7+'  'NH5+'  'NH1+'  'NH2+' ...
         'SF7+'  'SF5+'  'SF1+'  'SF2+'  'SH7+'  'SH5+'  'SH1+'  'SH2+'};
-elseif strcmp(experimentNum, '4') || strcmp(experimentNum, '5')
+elseif strcmp(expCode, '4') || strcmp(expCode, '5')
     events_epoch = {'NF7+'  'NF2+'  'NH7+'  'NH2+'...
         'SF7+'  'SF2+'  'SH7+'  'SH2+'};
 end

@@ -31,7 +31,7 @@ end
 %% input info
 epochStart = -0.5;
 epochEnd = 1;
-addpath(['.', filesep, 'Common_Functions']);
+addpath(genpath(['.', filesep, 'Common_Functions']));
 
 %% 100 Preparation %%% changes needed for new user %%%
 % get the ID (string) and name of this participant

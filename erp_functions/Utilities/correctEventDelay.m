@@ -27,4 +27,9 @@ for j = 1:size(EEG.event,2)
     end
 end
 
-EEG.event.latency = ([EEG.urevent.latency] + adjustedDelaySize*isOnset)';
+% EEG.event.latency = ([EEG.urevent.latency] + adjustedDelaySize*isOnset)';
+
+fprintf(['The latency of following events were offset by %d.\n'...
+    repmat('%s, ', 1, length(events)-1) '%s.\n'], delaySize, events{1, :});
+
+end

@@ -111,11 +111,10 @@ for iProcess = 1:nFilter
     
     %%%% 102 Change time point
     allevents = {EEG.event.type};
-    switch expCode
-        case '2' || '3'
-            isSaveEvent = cellfun(@(x) ismember(x(4), {'+', '-'}), allevents);
-        case '4' || '5'
-            isSaveEvent = cellfun(@(x) strcmp(x(4), '+') || strcmp(x(1:3), 'blo'), allevents);
+    if ismember(expCode, {'2', '3'})
+        isSaveEvent = cellfun(@(x) ismember(x(4), {'+', '-'}), allevents);
+    elseif ismember(expCode, {'4', '5'})
+        isSaveEvent = cellfun(@(x) strcmp(x(4), '+') || strcmp(x(1:3), 'blo'), allevents);
     end
     screenEvents = unique(allevents(isSaveEvent));
     EEG = correctEventDelay(EEG, 50, screenEvents);

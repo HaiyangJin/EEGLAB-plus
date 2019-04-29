@@ -113,10 +113,11 @@ for iProcess = 1:nFilter
     allevents = {EEG.event.type};
     switch expCode
         case '2' || '3'
-            screenEvents = cellfun(@(x) ismember(x(4), {'+', '-'}), allevents);
+            isSaveEvent = cellfun(@(x) ismember(x(4), {'+', '-'}), allevents);
         case '4' || '5'
-            screenEvents = cellfun(@(x) strcmp(x(4), '+') || strcmp(x(1:3), 'blo'), allevents);
+            isSaveEvent = cellfun(@(x) strcmp(x(4), '+') || strcmp(x(1:3), 'blo'), allevents);
     end
+    screenEvents = unique(allevents(isSaveEvent));
     EEG = correctEventDelay(EEG, 50, screenEvents);
     
     %%%% 103 Re-sample to 250 Hz
@@ -131,7 +132,7 @@ for iProcess = 1:nFilter
         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
 %     EEG = pop_chanedit(EEG, 'load',{'GSN-HydroCel-129.sfp' 'filetype' 'autodetect'},...
 %         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
-    
+%     
     %%%% 106 Remove line noise using CleanLine
     EEG = pop_cleanline(EEG, 'bandwidth', 2,'chanlist', 1:EEG.nbchan, ...
         'computepower', 0, 'linefreqs', [50 100 150 200 250], 'normSpectrum', 0, ...
@@ -140,7 +141,8 @@ for iProcess = 1:nFilter
     
     %%%% 107 Remove bad channels
     chanStruct = EEG.chanlocs;
-    [EEG, BUR] = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
+%     EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
+    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, -1);
     
     %%%% 108 Interpolate all the removed channels
     EEG = pop_interp(EEG,chanStruct,'Spherical');

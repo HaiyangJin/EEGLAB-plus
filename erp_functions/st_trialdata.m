@@ -104,7 +104,15 @@ for iEpoch = 1:nTrial
         urRT = repmat(thisUrTrialInfo{1, 'urRT'}, nRow, 1);
     end
     
-    thisIVTable = table(Channel, Event, Urevent, TrialNumber, Block, Response, urResponse, RT, urRT);
+    % rejected trials by pop_eegthresh and pop_jointprob in EEGlab_120
+    Rejthresh = repmat(EEG.reject.rejthresh(iEpoch), nRow, 1);
+    Rejjp = repmat(EEG.reject.rejjp(iEpoch), nRow, 1);
+    
+    Reject = Rejthresh .* Rejjp;
+    
+    
+    thisIVTable = table(Channel, Event, Urevent, TrialNumber, Block, ...
+        Response, urResponse, RT, urRT, Reject, Rejthresh, Rejjp);
     thisDVTable = array2table(thisTrialData, 'VariableNames', varNames);
     
     trialEpochTableIV = vertcat(trialEpochTableIV, thisIVTable); %#ok<AGROW>

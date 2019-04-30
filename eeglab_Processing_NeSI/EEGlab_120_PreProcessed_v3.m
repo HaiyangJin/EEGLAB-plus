@@ -195,7 +195,7 @@ for iFile = 1:nFiles
     % EEG = pop_rejepoch( EEG, stillBads, 0);
     
     %%%% 117 Baseline correction
-    EEG = pop_rmbase(EEG, [epochStart*1000 0]);
+    EEG = pop_rmbase(EEG, [-200 0]);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%% work on the labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

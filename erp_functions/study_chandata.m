@@ -10,10 +10,12 @@ function epoch_table = study_chandata(STUDY, ALLEEG, channel)
 % In order to divide the data based on responses or blocks. Please use the
 % custom command. (st_analysis) with (saveBinEpoch = 1)
 
+% !! cannot deal the situation that the bad trials are not removed.
+
 if nargin < 2
     error('Not enough input arguments.');
 end
-if nargin < 3
+if nargin < 3 || isempty(channel)
     channel = {STUDY.changrp.channels};  % by default
 end
 

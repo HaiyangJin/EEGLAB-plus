@@ -11,4 +11,4 @@
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
 #SBATCH --array=1500    # Array definition (1100,1200,1300,1400,1500 [1](Individual(1),all(1)),experimentNum(1234),00)
 module load MATLAB/2017b
-srun matlab -nodesktop -nosplash -r EEGlab_210_CreStu_Output_Lock_Topo_v3 $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID
+srun matlab -nodesktop -nosplash -r EEGlab_210_CreStu_Output_Lock_Topo $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

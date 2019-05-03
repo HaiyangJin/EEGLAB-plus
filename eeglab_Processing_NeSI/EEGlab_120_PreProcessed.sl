@@ -9,6 +9,6 @@
 #SBATCH --hint=nomultithread    # don't use hyperthreading
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --array=1500-1535   # Array definition 1101-1121 1200-1219 1301-1320 1401-1430 1500-1530([1]individual(1), all(1) and Participant numbers)
+#SBATCH --array=1200-1219   # Array definition 1101-1121 1200-1219 1301-1320 1401-1430 1500-1530([1]individual(1), all(1) and Participant numbers)
 module load MATLAB/2017b
-srun matlab -nodesktop -nosplash -r EEGlab_120_PreProcessed_v3 $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID
+srun matlab -nodesktop -nosplash -r EEGlab_120_PreProcessed $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

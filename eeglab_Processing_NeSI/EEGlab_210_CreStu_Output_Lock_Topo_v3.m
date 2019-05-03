@@ -125,7 +125,7 @@ elseif strcmp(expCode, '4')
 %     end
 elseif strcmp(expCode, '5')
 %     if basedAcc == 1
-        subjCodes = 1:35; 
+        subjCodes = [4, 6:8, 10:35]; 
 %     else
 %         subjCodes = [1:3]; %#ok<NBRAK>
 %     end
@@ -299,7 +299,7 @@ disp('Save or backup the Grand information successfully!');
 %% %%%% 304 Save the scalp distribution to check the location of peak %%%% %%
 % get topo data and grand topo data
 chanInfo = ALLEEG(1).chanlocs;
-[topo_table, gtopo_table] = topodata_plot(epoch_table, gwindowTable, chanInfo);
+[topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo);
 
 gtopoSheetname = 'GrandTopo'; 
 topoSheetname = 'Topo';

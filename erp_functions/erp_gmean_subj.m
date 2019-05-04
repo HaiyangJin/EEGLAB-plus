@@ -76,8 +76,8 @@ for iSubj = 1:nSubj
     
     if isWeighted
         data_table = join(subjData, trialNum_table);
-        trialNum = sum(data_table.Count);
-        data_table.Weight = data_table.Count ./ trialNum;
+        trialNum = sum(data_table.BinCount);
+        data_table.Weight = data_table.BinCount ./ trialNum;
     else
         data_table = subjData;
         data_table.Weight = repmat(1/size(data_table, 1), size(data_table, 1), 1);

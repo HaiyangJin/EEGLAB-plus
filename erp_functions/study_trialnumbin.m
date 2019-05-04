@@ -24,10 +24,10 @@ for iSubj = 1:length(subjCodeAll)
         Count = splitapply(@length, allEvents, G);
         
         Event = Event';
-        Count = Count';
+        BinCount = Count';
         SubjCode = repmat({thisSubj}, length(Event), 1);
         
-        thisTrial_table = table(SubjCode, Event, Count);
+        thisTrial_table = table(SubjCode, Event, BinCount);
         
         trialNum_table = vertcat(trialNum_table, thisTrial_table); %#ok<AGROW>
         

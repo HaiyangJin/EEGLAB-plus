@@ -1,4 +1,4 @@
-function  trialEpochTable = st_trialdata(EEG, channels, onsetEvent, respEvent, blockEvent)
+function  trialEpochTable = st_trialdata(EEG, channels, isBinAvg, isReject, onsetEvent, respEvent, blockEvent)
 % EEG: from eeglab
 % channels: which channels would you like to output (double or cell)
 % onsetEvent(cell): event of the onsets
@@ -13,21 +13,27 @@ if nargin < 1
     error('Not enough inputs for eeg_trialdata!');
 end
 if nargin <2 || isempty(channels)
-    channels = 1:length(EEG.chanlocs);
+    channels = 1:EEG.nbchan;
 else
     channels = channame(channels); % covert anything to cell
     channels = sort(cellfun(@(x) str2double(x(2:end)), channels)); % convert cell to numbers
 end
-if nargin < 3 || isempty(onsetEvent) || isempty(respEvent) || isempty(blockEvent)
+if nargin < 3 || isempty(isBinAvg)
+    isBinAvg = 0;
+end
+if nargin < 4 || isempty(isReject)
+    isReject = 0;
+end
+if nargin < 5 || isempty(onsetEvent) || isempty(respEvent) || isempty(blockEvent)
     events = unique({EEG.urevent.type});
 end
-if nargin < 3
+if nargin < 5
     onsetEvent = events(cellfun(@(x) strcmp(x(end), '+'), events));
 end
-if nargin < 4
+if nargin < 6
     respEvent = events(cellfun(@(x) strcmp(x(1:2), 'RE'), events));
 end
-if nargin < 5
+if nargin < 7
     blockEvent = events(cellfun(@(x) strcmp(x(1:3), 'blo'), events));
 end
 
@@ -63,6 +69,7 @@ trialEpochTableIV = table;
 trialEpochTableDV = table;
 
 for iEpoch = 1:nTrial
+    
     % DV
     % data for this trial
     thisTrialData = EEG.data(channels,:,iEpoch);
@@ -122,6 +129,29 @@ end
 % save the participant code
 trialEpochTableIV.SubjCode = repmat({EEG.setname(1:4)}, size(trialEpochTableIV, 1), 1);
 
-trialEpochTable = horzcat(trialEpochTableIV, trialEpochTableDV);
+allTrialEpoch = horzcat(trialEpochTableIV, trialEpochTableDV);
+
+%% remove the bad trials
+if isReject
+    allTrialEpoch = allTrialEpoch(~allTrialEpoch.Reject, :);
+end
+
+%% save bin averaged data
+if isBinAvg
+    [~, isDataColu] = xposition(allTrialEpoch.Properties.VariableNames);
+    
+    [G, Channel, Event, urResponse, SubjCode] = findgroups(allTrialEpoch.Channel, allTrialEpoch.Event, ...
+        allTrialEpoch.urResponse, allTrialEpoch.SubjCode);
+    
+    DV = splitapply(@(x) mean(x, 1), allTrialEpoch{:, isDataColu}, G);
+    Count = splitapply(@(x) size(x, 1), allTrialEpoch.P0, G);
+    
+    IV_table = table(Channel, Event, urResponse, SubjCode, Count);
+    DV_table = array2table(DV, 'VariableNames', allTrialEpoch.Properties.VariableNames(isDataColu));
+    
+    trialEpochTable = [IV_table, DV_table];
+else
+    trialEpochTable = allTrialEpoch;
+end
 
 end

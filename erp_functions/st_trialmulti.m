@@ -1,4 +1,4 @@
-function allTrialTable = st_trialmulti(studyPath, channels, saveCSV)
+function allTrialTable = st_trialmulti(studyPath, channels, isBinAvg, isReject, saveCSV)
 % This script helps to get the raw trial data from multiple data set
 % (*.set).
 if nargin < 1 || isempty(studyPath)
@@ -22,7 +22,13 @@ if nargin < 2 || isempty(channels)
 else
     channels = channame(channels);
 end
-if nargin < 3
+if nargin < 3 || isempty(isBinAvg)
+    isBinAvg = [];
+end
+if nargin < 4 || isempty(isReject)
+    isReject = [];
+end
+if nargin < 5
     saveCSV = 0;
 end
 
@@ -47,7 +53,7 @@ else
         thisFilename = filenames{1, iFile}; % this filename
         EEG = pop_loadset('filename',thisFilename,'filepath',studyPath);
         
-        thisAllTrialEpoch = st_trialdata(EEG, channels);
+        thisAllTrialEpoch = st_trialdata(EEG, channels, isBinAvg, isReject);
 
         allTrialTable = vertcat(allTrialTable, thisAllTrialEpoch); %#ok<AGROW>
     end

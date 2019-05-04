@@ -138,14 +138,16 @@ disp(['Save the study of ', studyName, ' successfully!']);
 % Output the mean for all trials for each condition, every participant, and
 % every channels.
 
-% remove the bad trials from ALLEEG
-ALLEEGT = study_rejecttrials(ALLEEG);
+% Get the vaeraged bin data
+isBinAvg = 1;
+isReject = 1;
+binavg_table = st_trialmulti('.', [], isBinAvg, isReject);
 
 % get the channel data for all channels
 % epoch_table = study_chandata(STUDY, ALLEEG);  % cannot be used if bad trials are not removed
 
 % save the mean of the raw data into the excel amd the backup file
-if ~exist(dt, 'var'); dt = datestr(now,'yymmddHH'); end
+if ~exist('dt', 'var'); dt = datestr(now,'yymmddHH'); end
 
 sheetName_epoch = [expFolderCode,'_AllChanEpoch']; 
 filename_epoch = strcat(studyPath, sheetName_epoch, '_', folderInfo);
@@ -154,10 +156,10 @@ filename_xlsx = strcat(filename_epoch, '_', dt, '.xlsx');
 filename_mat = strcat(filename_epoch, '_', dt, '.mat');
 
 if ispc || ismac
-    writetable(epoch_table, filename_xlsx, 'Sheet', sheetName_epoch);
-    save(filename_mat, 'epoch_table', '-v7.3'); %, '-nocompression'
+    writetable(binavg_table, filename_xlsx, 'Sheet', sheetName_epoch);
+    save(filename_mat, 'binavg_table', '-v7.3'); %, '-nocompression'
 elseif isunix
-    save(filename_mat, 'epoch_table', '-v7.3'); %, '-nocompression'
+    save(filename_mat, 'binavg_table', '-v7.3'); %, '-nocompression'
 else
     error('Platform not supported!')
 end
@@ -170,8 +172,8 @@ disp('Save or backup the raw epoch data successfully!');
 trialNum_table = study_trialnumbin(STUDY);  % 
 
 % calculate the grand average
-gmeanTable = erp_gmean_assum(epoch_table, trialNum_table);  % Weighted mean
-% gmeanTable = erp_gmean(epoch_table);  % (normal) mean
+gmeanTable = erp_gmean_assum(binavg_table, trialNum_table);  % Weighted mean
+% gmeanTable = erp_gmean(binavg_table);  % (normal) mean
 
 %% %%%% 303 Lock the time windows %%%% %%
 % 2. then calculate the time windows for this grand average.
@@ -209,7 +211,7 @@ disp('Save or backup the Grand information successfully!');
 %% %%%% 304 Save the scalp distribution to check the location of peak %%%% %%
 % get topo data and grand topo data
 chanInfo = ALLEEG(1).chanlocs;
-[topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo);
+[topo_table, gtopo_table] = plot_topodata(binavg_table, gwindowTable, chanInfo);
 
 gtopoSheetname = 'GrandTopo'; 
 topoSheetname = 'Topo';

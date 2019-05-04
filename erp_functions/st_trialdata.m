@@ -79,8 +79,8 @@ for iEpoch = 1:nTrial
     theEvents = EEG.epoch(iEpoch).eventtype;
     isOnset = ismember(theEvents, onsetEvent);
     if sum(isOnset) > 1
-        warning(['There are more than one onset events in this epoch!\n'...
-            'filename: %s'], EEG.setname);
+        warning(['There are more than one onset events in the epoch %d!\n'...
+            'filename: %s'], iEpoch, EEG.setname);
     end
     Event = repmat(theEvents(isOnset), nRow, 1);
     Urevent = repmat(thisUrevent, nRow, 1);
@@ -89,8 +89,12 @@ for iEpoch = 1:nTrial
     
     TrialNumber = repmat(thisUrTrialInfo{1, 'TrialNumber'}, nRow, 1);
     
-    if isBlock
-        isBlockTemp = ismember(theEvents, blockEvent);
+    isBlockTemp = ismember(theEvents, blockEvent);
+    if sum(isBlockTemp) == 0
+        warning(['There is no block event for the epoch %d? \n'...
+            'filename: %s'], iEpoch, EEG.setname);
+    end
+    if isBlock && any(isBlockTemp)
         blockStr = theEvents{isBlockTemp};
         Block = repmat(regexp(blockStr, '\d*', 'match'), nRow, 1);
     else

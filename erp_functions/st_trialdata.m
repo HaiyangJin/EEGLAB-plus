@@ -90,7 +90,7 @@ for iEpoch = 1:nTrial
     TrialNumber = repmat(thisUrTrialInfo{1, 'TrialNumber'}, nRow, 1);
     
     isBlockTemp = ismember(theEvents, blockEvent);
-    if sum(isBlockTemp) == 0
+    if sum(isBlockTemp) == 0 && ~strcmp(EEG.setname(2), '4')
         warning(['There is no block event for the epoch %d? \n'...
             'filename: %s'], iEpoch, EEG.setname);
     end

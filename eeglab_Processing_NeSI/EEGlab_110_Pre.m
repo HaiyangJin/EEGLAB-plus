@@ -91,7 +91,7 @@ for iProcess = 1:nFilter
     % weight from data of step 1
     
     %%%% 101 Load raw data and save it
-    [ALLEEG , ~, ~, ALLCOM] = eeglab;  % start the eeglab
+    eeglab versions;  % start the eeglab
     pop_editoptions( 'option_storedisk', 1, 'option_savetwofiles', 1, 'option_saveversion6', 1, ...
         'option_single', 0, 'option_memmapdata', 0, 'option_eegobject', 0, 'option_computeica', 1, ...
         'option_scaleicarms', 1, 'option_rememberfolder', 1, 'option_donotusetoolboxes', 0, ...
@@ -141,7 +141,7 @@ for iProcess = 1:nFilter
     %%%% 107 Remove bad channels
     chanStruct = EEG.chanlocs;
 %     EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
-    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, -1);
+    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 20, -1);
     
     %%%% 108 Interpolate all the removed channels
     EEG = pop_interp(EEG,chanStruct,'Spherical');

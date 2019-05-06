@@ -9,6 +9,6 @@
 #SBATCH --hint=nomultithread    # don't use hyperthreading
 #SBATCH --mail-type=END
 #SBATCH --mail-user=hjin317@aucklanduni.ac.nz
-#SBATCH --array=401-430   # Array definition 101-121 200-219 301-320 401-430 500-535
+#SBATCH --array=401   # Array definition 101-121 200-219 301-320 401-430 500-535
 module load MATLAB/2017b
 matlab -nodesktop -nosplash -r EEGlab_110_Pre $SLURM_ARRAY_TASK_ID $SLURM_ARRAY_JOB_ID

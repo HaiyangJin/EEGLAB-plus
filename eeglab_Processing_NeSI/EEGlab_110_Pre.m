@@ -189,11 +189,13 @@ end
 
 %%%% 111: Estimate single equivalent current dipoles
 coordinateTransformParameters = [0.05476 -17.3653 -8.1318 0.075502 0.0031836 -1.5696 11.7138 12.7933 12.213];
-templateChannelFilePath = [eeglabPath, 'plugins/dipfit2.3/standard_BEM/elec/standard_1005.elc'];
-hdmFilePath = [eeglabPath, '/plugins/dipfit2.3/standard_BEM/standard_vol.mat'];
+dipfitFolder = dir([eeglabPath 'plugins' filesep 'dipfit*']);
+templateChannelFilePath = [dipfitFolder.folder filesep dipfitFolder.name '/standard_BEM/elec/standard_1005.elc'];
+hdmFilePath = [dipfitFolder.folder filesep dipfitFolder.name '/standard_BEM/standard_vol.mat'];
+mriFilePath = [dipfitFolder.folder filesep dipfitFolder.name '/standard_BEM/standard_mri.mat'];
 EEG = pop_dipfit_settings( EEG, 'hdmfile', hdmFilePath, 'coordformat', 'MNI',...
-    'mrifile', [eeglabPath, '/plugins/dipfit2.3/standard_BEM/standard_mri.mat'],...
-    'chanfile', templateChannelFilePath, 'coord_transform', coordinateTransformParameters,...
+    'mrifile', mriFilePath, 'chanfile', templateChannelFilePath, ...
+    'coord_transform', coordinateTransformParameters,...
     'chansel', 1:EEG.nbchan);
 EEG = pop_multifit(EEG, 1:EEG.nbchan,'threshold', 100, 'dipplot','off','plotopt',{'normlen' 'on'});
 

@@ -54,4 +54,5 @@ EEG = pop_saveset( EEG, 'filename',fn_rejected,'filepath','.');
 %% remove all data
 STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
 eeglab redraw
+clear fn_rejected
 

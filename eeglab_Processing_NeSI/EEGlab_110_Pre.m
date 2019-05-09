@@ -127,11 +127,10 @@ for iProcess = 1:nFilter
         'Design', 'butter', 'Filter', 'bandpass', 'Order',  4, 'RemoveDC', 'on' );
     
     %%%% 105 Import channel info
-    EEG = pop_chanedit(EEG, 'load',{strcat(projectPath,'Common_Functions', filesep, 'GSN-HydroCel-129.sfp') 'filetype' 'autodetect'},...
+    channelFile = strcat(projectPath,'Common_Functions', filesep, 'GSN-HydroCel-129.sfp');
+    EEG = pop_chanedit(EEG, 'load',{channelFile 'filetype' 'autodetect'},...
         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
-%     EEG = pop_chanedit(EEG, 'load',{'GSN-HydroCel-129.sfp' 'filetype' 'autodetect'},...
-%         'setref',{'4:132' 'Cz'},'changefield',{132 'datachan' 0});
-%     
+     
     %%%% 106 Remove line noise using CleanLine
     EEG = pop_cleanline(EEG, 'bandwidth', 2,'chanlist', 1:EEG.nbchan, ...
         'computepower', 0, 'linefreqs', [50 100 150 200 250], 'normSpectrum', 0, ...
@@ -178,6 +177,10 @@ for iProcess = 1:nFilter
         EEG.icasphere  = EEG.etc.amica.S;
         EEG = eeg_checkset(EEG, 'ica');
         EEG_Weight = EEG;
+        
+        if nFilter ~= 1
+            STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
+        end
         
     elseif iProcess == 2
         %%%% apply the ICA weight from 1 Hz data to 0.1 Hz data

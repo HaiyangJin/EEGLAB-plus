@@ -1,5 +1,7 @@
-function [gwinTable, zeroTable] = erp_gwindow(gmeanTable, method, isPlot, funvar, assumedWin)
+function [gwinTable, zeroTable] = erp_gwindow(gmeanTable, method, windowSize, isPlot, funvar, assumedWin)
 % calculate the time windows for grand average
+% windowSize: how large the grand mean time window should be? [min max step](ms)
+%             windowSize = [] means no limit
 % method: '1--ratio' or '2--fixWin'
 %         'ratio': locate the peak value, and use the time points of the
 %         ratio (e.g. 0.5, funvar) of amplitude as the time window.
@@ -9,20 +11,26 @@ function [gwinTable, zeroTable] = erp_gwindow(gmeanTable, method, isPlot, funvar
 %             column is the name of the component (start with N or P). The
 %             second and third columns are the aussmed start and end of
 %             time windows.
-% funvar: if method is 'ratio', funvar refers to ratioPeak
-%         if method is 'meanAmp', funvar refers to
-
+% funvar: if method is 'ratio' (1), funvar refers to ratioPeak
+%         if method is 'meanAmp' (2), funvar refers to nothing
+%         if method is 'localMeanAmplitude' (3), funvar refers to the widow
+%         size
 
 if nargin < 2 || isempty(method)
     method = 1;
 end
-if nargin < 3 || isempty(isPlot)
+if nargin < 3 && method == 1
+    windowSize = [36 40 .1];  % [min max]
+else
+    windowSize = [];
+end
+if nargin < 4 || isempty(isPlot)
     isPlot = 1;
 end
-if nargin < 4 || isempty(funvar)
+if nargin < 5 || isempty(funvar)
     funvar = [];
 end
-if nargin < 5
+if nargin < 6
     assumedWin = [];
 end
 
@@ -53,8 +61,62 @@ for iComp = 1:nComp
     thisComp = zeroTable{iComp, 1};
     if iscell(thisComp); thisComp = thisComp{1}; end
     
+    if ~isempty(windowSize)
+        winMin = windowSize(1);
+        winMax = windowSize(2);
+        winStep = windowSize(3);
+    end
+    isWhile = 1;
+    Nwhile = 0;
+    funvarList = zeros(1, 3);
+
+    while isWhile && Nwhile < 1000
+        
+        thisTW = erp_window(theEpochData, checkWindow, thisComp, method, funvar);
+        
+        if ~isempty(windowSize)  % only test the window size for method 1 if necessary
+            Nwhile = Nwhile + 1;
+
+            if isempty(funvar)
+                funvarList(Nwhile) = 0; 
+            else
+                funvarList(Nwhile) = funvar; 
+            end
+            
+            isSmall = thisTW.WindowSize < winMin;
+            isLarge = thisTW.WindowSize > winMax;
+            
+            if isSmall || isLarge
+                
+                funvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2;
+                
+                if funvarList(end-1) == funvar
+                    winStep = winStep / 2;
+                end
+                
+                warning(['The size of window frames for %s is %d.\n' ...
+                    'The size of window times for %s is %d.\n' ...
+                    'Re-computing with ratio of %d...'], ...
+                    thisTW.Component, thisTW.FrameSize, ...
+                    thisTW.Component, thisTW.WindowSize, ...
+                    funvar);
+                
+            else
+                isWhile = 0; % stop the while loop
+                
+            end
+        else
+            isWhile = 0;
+        end
+        
+    end
     
-    tw(iComp) = erp_window(theEpochData, checkWindow, thisComp, method, funvar); %#ok<AGROW>
+    tw(iComp) = thisTW; %#ok<AGROW>
+    
+        fprintf(['The size of window frames for %s is %d.\n' ...
+        'The size of window times for %s is %d.\n'], ...
+        tw(iComp).Component, tw(iComp).FrameSize, ...
+        tw(iComp).Component, tw(iComp).WindowSize);
     
 end
 
@@ -63,7 +125,7 @@ gwinTable = horzcat(struct2table(tw), zeroTable(:, 'nTrans'));
 
 %% Plot the grand average ERP and the time windows
 if isPlot
-    methodCell = {'ratio', 'fixedWin'};
+    methodCell = {'ratio', 'fixedWin', 'EvenWinAroundPeak'};
     % Plot the grand average of the data for this component
     % Mark the time window
     gfigure = figure('NumberTitle', 'off', 'Name', 'Locking Time Window Based on the Grand Average ERP',...

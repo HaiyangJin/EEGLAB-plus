@@ -178,7 +178,7 @@ gmeanTable = erp_gmean_assum(binavg_table, trialNum_table);  % Weighted mean
 %% %%%% 303 Lock the time windows %%%% %%
 % 2. then calculate the time windows for this grand average.
 [gwindowTable, zeroTable] = erp_gwindow(gmeanTable); 
-% [gwindowTable2, zeroTable2] = erp_gwindow(gmeanTable, 2);  % method 2
+% [gwindowTable2, zeroTable2] = erp_gwindow(gmeanTable, 3);  % method 2
 if isunix && ~ismac; close; end
 
 % save grand average ERP into the excel amd the backup file

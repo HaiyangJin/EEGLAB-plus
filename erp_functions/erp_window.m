@@ -77,7 +77,7 @@ switch method
         % find the time points where the peak is (the peak is the max or min values
         % among the nearest X data points)
         if isempty(funvar)
-            funvar = 24;
+            funvar = 36;
         end
         windowSize = funvar;
         windowSize4Peak = round(windowSize/lagFrame);  % the size of the time window for get the averaged peak
@@ -122,7 +122,8 @@ tw.EndFrame = endFrame;
 tw.StartTime = startFrame * lagFrame;
 tw.PeakTime = tw.PeakFrame * lagFrame;
 tw.EndTime = endFrame * lagFrame;
-tw.WindowSize = (endFrame - startFrame) * lagFrame;
+tw.FrameSize = endFrame - startFrame;
+tw.WindowSize = tw.EndTime - tw.StartTime;
 tw.StartAmplitude = startAmp;
 tw.PeakAmplitude = peak;
 tw.EndAmplitude = endAmp;

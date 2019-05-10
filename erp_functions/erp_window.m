@@ -46,6 +46,12 @@ switch method
         refAmp = ratioPeak * peak;
         
         % find the time point for the refAmp
+        if funvar < 0
+            nExpand = 5;
+            thisCheckStart = thisCheckStart - nExpand;
+            thisCheckEnd = thisCheckEnd + nExpand;
+        end
+        
         for iFrame = thisCheckStart : thisCheckEnd
             tempAmp1 = grandAvgPosi{1, iFrame};
             tempAmp2 = grandAvgPosi{1, iFrame + 1};
@@ -101,13 +107,11 @@ switch method
 end
 if ~exist('startFrame', 'var')
     startFrame = thisCheckStart;
-    remarks = sprintf('Assumed start point is used for %s.', compName);
-    warning(remarks); %#ok<SPWRN>
+    warning('Assumed start point is used for %s.', compName); 
 end
 if ~exist('endFrame', 'var')
     endFrame = thisCheckEnd;
-    remarks = sprintf('Assumed end point is used for %s.', compName);
-    warning(remarks); %#ok<SPWRN>
+    warning('Assumed end point is used for %s.', compName); 
 end
 
 startAmp = grandAvgPosi{1, startFrame};

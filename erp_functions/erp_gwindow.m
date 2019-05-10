@@ -88,7 +88,7 @@ for iComp = 1:nComp
             
             if isSmall || isLarge
                 
-                funvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2;
+                funvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2; % (.5 - isSmall) * 2
                 
                 if funvarList(end-1) == funvar
                     winStep = winStep / 2;

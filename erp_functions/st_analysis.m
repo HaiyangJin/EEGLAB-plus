@@ -76,7 +76,7 @@ if ispc || ismac
         'Please select the study folder:');
 else
     Mahuika;
-    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual_All' filesep];
+    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' filesep];
 end
 cd(studyPath);
 
@@ -103,7 +103,7 @@ end
 %% Locate and load the time window files
 % twFile = dir('finalTW');
 % load([twFile.path filesep twFile.name]);
-load('finalTW');
+load([expCode '_finalTW']);
 fprintf('\nLoading the time window information...\n');
 if isgwindow
     tw = gwindowTable;

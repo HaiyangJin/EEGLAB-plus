@@ -12,16 +12,17 @@ topoFilename = [expCode '_00_TopoData_' analysisCode];
 
 %% load grand mean, grand time window, allChanTable and topoData
 % grand mean and time window
-grandFile = dir([expCode, '_Grand*.mat']);
-load(grandFile.name);
+pathMat = ['from210' filesep];
+grandFile = dir([pathMat expCode, '_Grand*.mat']);
+load([grandFile.folder filesep grandFile.name]);
 
 % load AllChanEpoch
-epochFile = dir([expCode, '_AllChanEpoch*.mat']);
-load(epochFile.name);
+epochFile = dir([pathMat expCode, '_AllChanEpoch*.mat']);
+load([epochFile.folder filesep epochFile.name]);
 
 % load topo data
-topoFile = dir([expCode, '_TopoData*.mat']);
-load(topoFile.name);
+topoFile = dir([pathMat expCode, '_TopoData*.mat']);
+load([topoFile.folder filesep topoFile.name]);
 
 
 %% double check the channels for peak 
@@ -37,7 +38,7 @@ if ~isSameChan
     for iComp = 1:size(topoChanComp, 1)
         chanCent = topoChanComp(iComp, 2:3);
 %         thisgmeanTable = erp_gmean(epoch_table, trialNum_table, chanCent);  % Weighted mean (not accurate)
-        thisgmeanTable = erp_gmean_subj(epoch_table, trialNum_table, chanCent);  
+        thisgmeanTable = erp_gmean_subj(binavg_table, trialNum_table, chanCent);  
         thisgmeanTable.Component = topoChanComp(iComp, 1);
         gmeanTable = vertcat(gmeanTable, thisgmeanTable); %#ok<AGROW>
     end
@@ -47,7 +48,7 @@ if ~isSameChan
     if isunix && ~ismac; close; end
 
     % recreate the topomap
-    [topo_table, gtopo_table] = plot_topodata(epoch_table, gwindowTable, chanInfo);
+    [topo_table, gtopo_table] = plot_topodata(binavg_table, gwindowTable, chanInfo);
   
 end
 
@@ -56,7 +57,7 @@ end
 writetable(gwindowTable, [grandFilename, '_gwindow.csv']);
 writetable(gmeanTable, [grandFilename, '_gmean.csv']);
 writetable(zeroTable, [grandFilename, '_zero.csv']);
-writetable(epoch_table, [chandataFilename, '.csv']);
+writetable(binavg_table, [chandataFilename, '.csv']);
 
 % save the grand xlsx
 writetable(gwindowTable, [grandFilename, '_.xlsx'], 'Sheet', 'gwindow');
@@ -71,7 +72,7 @@ writetable(cell2table(topoChanComp), [topoFilename, '.xlsx'], 'Sheet', 'TopoChan
 
 %% calculate the amplitude for every bin
 % get the epoch data for every condition
-conEpochTable = erp_binepochtable(epoch_table, gwindowTable, isCluster);
+conEpochTable = erp_binepochtable(binavg_table, gwindowTable, isCluster);
 % get the local mean amplitude information for every bin
 conWindowTable_local = erp_binwindowpeak(conEpochTable, gwindowTable);  % local mean amplitude
 conWindowTable_meanAmp = erp_binwindowpeak(conEpochTable, gwindowTable, 2); % mean amplitude
@@ -82,7 +83,7 @@ writetable(conWindowTable_meanAmp, [peakFilename '_meanAmp.csv']);
 
 
 %% Face specific ERPs
-% specEpochTable = erp_facespecepoch(epoch_table);
+% specEpochTable = erp_facespecepoch(binavg_table);
 % 
 % specConEpochTable = erp_binepochtable(specEpochTable, gwindowTable, isCluster);
 % % Output the peak value
@@ -92,7 +93,7 @@ writetable(conWindowTable_meanAmp, [peakFilename '_meanAmp.csv']);
 
 %% save final grand time window and condition time window for single trial analysis
 if strcmpi(analysisCode, 'all')
-    save('finalTW', 'gwindowTable', 'conWindowTable_local');
+    save([expCode '_finalTW'], 'gwindowTable', 'conWindowTable_local');
 end
 
 end

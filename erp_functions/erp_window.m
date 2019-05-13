@@ -33,6 +33,9 @@ elseif isNegative
     [peak, peakFrame] = min(thisGrandAvg);
 end
 
+startFrame = [];
+endFrame = [];
+
 switch method
     case 1  % method 1 -- fractional (output: the grand window)
         % mainly used for grand average (fractional)
@@ -62,6 +65,10 @@ switch method
             elseif tempAmp1 >= refAmp && refAmp >= tempAmp2
                 if isPositive; endFrame = iFrame + 1; end
                 if isNegative; startFrame = iFrame; end
+            end
+            
+            if ~isempty(startFrame) && ~isempty(endFrame)
+                break;
             end
             
         end
@@ -105,11 +112,11 @@ switch method
         tw.OldWindowStart = thisCheckStart;
         tw.OldWindowEnd = thisCheckEnd;
 end
-if ~exist('startFrame', 'var')
+if isempty(startFrame)
     startFrame = thisCheckStart;
     warning('Assumed start point is used for %s.', compName); 
 end
-if ~exist('endFrame', 'var')
+if isempty(endFrame)
     endFrame = thisCheckEnd;
     warning('Assumed end point is used for %s.', compName); 
 end

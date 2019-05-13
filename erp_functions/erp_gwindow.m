@@ -133,7 +133,7 @@ if isPlot
     gfigure = figure('NumberTitle', 'off', 'Name', 'Locking Time Window Based on the Grand Average ERP',...
         'Renderer', 'painters', 'Position', [100 100 1000 700]);
     xStart = -200;
-    xEnd = 500;
+    xEnd = 996; % 500;
     xNames = gmeanTable.Properties.VariableNames;
     [yStart, ~, lagFrame] = xposition(xNames, xconverter(xStart));
     yEnd = xposition(xNames, xconverter(xEnd));

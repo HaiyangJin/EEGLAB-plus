@@ -79,6 +79,34 @@ switch expCode
         subjCodes = 1:30;
     case '5'
         subjCodes = [4, 6:8, 10:35];
+        
+        % move the data files for excluded participants
+        allSubjCodes = 0:35;
+        isExcluded = allSubjCodes(~ismember(allSubjCodes, subjCodes));
+        
+        % crate a folder named excluded
+        excFolder = 'Excluded';
+        if ~exist(excFolder, 'dir')
+            mkdir(excFolder);
+        end
+        
+        nExcluded = length(isExcluded);
+        isMoved = zeros(1, nExcluded);
+        for iExc = 1: nExcluded
+            thisFilename = ['*' num2str(isExcluded(iExc),'P5%02d') '*'];
+            
+            if ~isempty(dir(thisFilename))
+                movefile(thisFilename, excFolder);
+                isMoved(iExc) = 1;
+            end
+        end
+        
+        excSubjNames = arrayfun(@(x) num2str(x,'P5%02d'), isExcluded, ...
+            'UniformOutput', false);    
+        if any(isMoved)
+            fprintf('Data of %s are moved to the "Exluded" Folder.\n', excSubjNames{logical(isMoved)});
+        end
+        
 end
 nSubj = length(subjCodes); % the number of participants
 

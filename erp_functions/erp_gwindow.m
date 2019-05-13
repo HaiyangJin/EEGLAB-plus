@@ -49,6 +49,8 @@ clear tw
 
 for iComp = 1:nComp
     
+    thisFunvar = funvar;
+    
     if size(gmeanTable, 1) == 1
         igmean = 1;
     else
@@ -72,15 +74,15 @@ for iComp = 1:nComp
 
     while isWhile && Nwhile < 1000
         
-        thisTW = erp_window(theEpochData, checkWindow, thisComp, method, funvar);
+        thisTW = erp_window(theEpochData, checkWindow, thisComp, method, thisFunvar);
         
         if ~isempty(windowSize)  % only test the window size for method 1 if necessary
             Nwhile = Nwhile + 1;
 
-            if isempty(funvar)
+            if isempty(thisFunvar)
                 funvarList(Nwhile) = 0; 
             else
-                funvarList(Nwhile) = funvar; 
+                funvarList(Nwhile) = thisFunvar; 
             end
             
             isSmall = thisTW.WindowSize < winMin;
@@ -88,9 +90,9 @@ for iComp = 1:nComp
             
             if isSmall || isLarge
                 
-                funvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2; % (.5 - isSmall) * 2
+                thisFunvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2; % (.5 - isSmall) * 2
                 
-                if funvarList(end-1) == funvar
+                if funvarList(end-1) == thisFunvar
                     winStep = winStep / 2;
                 end
                 
@@ -99,7 +101,7 @@ for iComp = 1:nComp
                     'Re-computing with ratio of %d...'], ...
                     thisTW.Component, thisTW.FrameSize, ...
                     thisTW.Component, thisTW.WindowSize, ...
-                    funvar);
+                    thisFunvar);
                 
             else
                 isWhile = 0; % stop the while loop

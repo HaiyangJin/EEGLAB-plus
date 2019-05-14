@@ -1,4 +1,4 @@
-function  trialEpochTable = st_trialdata(EEG, channels, isBinAvg, isReject, onsetEvent, respEvent, blockEvent)
+function  allTrialEpoch = st_trialdata(EEG, channels, onsetEvent, respEvent, blockEvent)
 % EEG: from eeglab
 % channels: which channels would you like to output (double or cell)
 % onsetEvent(cell): event of the onsets
@@ -12,28 +12,22 @@ function  trialEpochTable = st_trialdata(EEG, channels, isBinAvg, isReject, onse
 if nargin < 1
     error('Not enough inputs for eeg_trialdata!');
 end
-if nargin <2 || isempty(channels)
+if nargin < 2 || isempty(channels)
     channels = 1:EEG.nbchan;
 else
     channels = channame(channels); % covert anything to cell
     channels = sort(cellfun(@(x) str2double(x(2:end)), channels)); % convert cell to numbers
 end
-if nargin < 3 || isempty(isBinAvg)
-    isBinAvg = 0;
-end
-if nargin < 4 || isempty(isReject)
-    isReject = 0;
-end
-if nargin < 5 || isempty(onsetEvent) || isempty(respEvent) || isempty(blockEvent)
+if nargin < 3 || isempty(onsetEvent) || isempty(respEvent) || isempty(blockEvent)
     events = unique({EEG.urevent.type});
 end
-if nargin < 5
+if nargin < 3
     onsetEvent = events(cellfun(@(x) strcmp(x(end), '+'), events));
 end
-if nargin < 6
+if nargin < 4
     respEvent = events(cellfun(@(x) strcmp(x(1:2), 'RE'), events));
 end
-if nargin < 7
+if nargin < 5
     blockEvent = events(cellfun(@(x) strcmp(x(1:3), 'blo'), events));
 end
 
@@ -116,11 +110,18 @@ for iEpoch = 1:nTrial
     end
     
     % rejected trials by pop_eegthresh and pop_jointprob in EEGlab_120
-    Rejthresh = repmat(EEG.reject.rejthresh(iEpoch), nRow, 1);
-    Rejjp = repmat(EEG.reject.rejjp(iEpoch), nRow, 1);
+    if exist(EEG.reject.rejthresh, 'var')
+        Rejthresh = repmat(EEG.reject.rejthresh(iEpoch), nRow, 1);
+    else
+        Rejthresh = zeros(nRow, 1);
+    end
+    if exist(EEG.reject.rejjp, 'var')
+        Rejjp = repmat(EEG.reject.rejjp(iEpoch), nRow, 1);
+    else
+        Rejjp = zeros(nRow, 1);
+    end
     
     Reject = Rejthresh .* Rejjp;
-    
     
     thisIVTable = table(Channel, Event, Urevent, TrialNumber, Block, ...
         Response, urResponse, RT, urRT, Reject, Rejthresh, Rejjp);
@@ -135,27 +136,5 @@ trialEpochTableIV.SubjCode = repmat({EEG.setname(1:4)}, size(trialEpochTableIV, 
 
 allTrialEpoch = horzcat(trialEpochTableIV, trialEpochTableDV);
 
-%% remove the bad trials
-if isReject
-    allTrialEpoch = allTrialEpoch(~allTrialEpoch.Reject, :);
-end
-
-%% save bin averaged data
-if isBinAvg
-    [~, isDataColu] = xposition(allTrialEpoch.Properties.VariableNames);
-    
-    [G, Channel, Event, urResponse, SubjCode] = findgroups(allTrialEpoch.Channel, allTrialEpoch.Event, ...
-        allTrialEpoch.urResponse, allTrialEpoch.SubjCode);
-    
-    DV = splitapply(@(x) mean(x, 1), allTrialEpoch{:, isDataColu}, G);
-    Count = splitapply(@(x) size(x, 1), allTrialEpoch.P0, G);
-    
-    IV_table = table(Channel, Event, urResponse, SubjCode, Count);
-    DV_table = array2table(DV, 'VariableNames', allTrialEpoch.Properties.VariableNames(isDataColu));
-    
-    trialEpochTable = [IV_table, DV_table];
-else
-    trialEpochTable = allTrialEpoch;
-end
 
 end

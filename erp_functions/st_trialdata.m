@@ -110,12 +110,12 @@ for iEpoch = 1:nTrial
     end
     
     % rejected trials by pop_eegthresh and pop_jointprob in EEGlab_120
-    if exist(EEG.reject.rejthresh, 'var')
+    if ~isempty(EEG.reject.rejthresh)
         Rejthresh = repmat(EEG.reject.rejthresh(iEpoch), nRow, 1);
     else
         Rejthresh = zeros(nRow, 1);
     end
-    if exist(EEG.reject.rejjp, 'var')
+    if ~isempty(EEG.reject.rejjp)
         Rejjp = repmat(EEG.reject.rejjp(iEpoch), nRow, 1);
     else
         Rejjp = zeros(nRow, 1);

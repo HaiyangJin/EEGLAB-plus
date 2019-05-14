@@ -167,10 +167,9 @@ disp(['Save the study of ', studyName, ' successfully!']);
 % every channels.
 
 % Get the vaeraged bin data
-isDetrend = 1;
 isBinAvg = 1;
 isReject = 1;
-binavg_table = st_trialmulti('.', [], isBinAvg, isReject, isDetrend);
+binavg_table = st_trialmulti('.', [], isBinAvg, isReject);
 
 % get the channel data for all channels
 % epoch_table = study_chandata(STUDY, ALLEEG);  % cannot be used if bad trials are not removed

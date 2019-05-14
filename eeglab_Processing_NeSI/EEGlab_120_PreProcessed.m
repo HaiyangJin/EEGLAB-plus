@@ -142,15 +142,18 @@ for iFile = 1:nFiles
     % stillBads = markBadEpochs(75,32,1,400,1,1000,EEG);
     % EEG = pop_rejepoch( EEG, stillBads, 0);
     
-    %%%% 117 Baseline correction
+    %%%% 117 Linear Detrend
+    EEG = pop_eeglindetrend( EEG, [baseline EEG.xmax*1000] ); % GUI
+    
+    %%%% 118 Baseline correction
     EEG = pop_rmbase(EEG, [baseline 0]);
     
-    %%%% 118 Save the PreProcessed data set for further data analysis
+    %%%% 119 Save the PreProcessed data set for further data analysis
     [~, EEG] = pop_newset(ALLEEG, EEG, 0,'setname', preProcessedName, 'gui','off');
     pop_saveset( EEG, 'filename', preProcessedName, 'filepath', preProcessedPath);
     
     disp('Save the preProcessed file successfully!');
-    
+
     
     %% %% 200 Create ERP study for this participant
     % crete the study only for this participant

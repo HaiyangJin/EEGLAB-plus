@@ -1,4 +1,4 @@
-function allTrialTable = st_trialmulti(studyPath, channels, isBinAvg, isReject, isDetrend, saveCSV)
+function allTrialTable = st_trialmulti(studyPath, channels, isBinAvg, isReject, saveCSV)
 % This script helps to get the raw trial data from multiple data set
 % (*.set).
 if nargin < 1 || isempty(studyPath)
@@ -28,10 +28,7 @@ end
 if nargin < 4 || isempty(isReject)
     isReject = [];
 end
-if nargin < 5 || isempty(isDetrend)
-    isDetrend = 0;
-end
-if nargin < 6
+if nargin < 5
     saveCSV = 0;
 end
 
@@ -58,11 +55,6 @@ else
         
         % all trials for this dataset
         thisAllTrialEpoch = st_trialdata(EEG, channels);
-        
-        % detrend
-        if isDetrend
-            thisAllTrialEpoch = erp_detrend(thisAllTrialEpoch, -200, 996);
-        end
         
         % bin average data & reject bad channels
         thisAllTrialEpoch = erp_binavg(thisAllTrialEpoch, isBinAvg, isReject);

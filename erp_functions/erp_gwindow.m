@@ -90,7 +90,12 @@ for iComp = 1:nComp
             
             if isSmall || isLarge
                 
-                thisFunvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2; % (.5 - isSmall) * 2
+                if thisTW.StartFrame == checkWindow(1) && thisTW.EndFrame == checkWindow(2)
+                    thisFunvar = 1.5;
+                else
+                    isConsistent = thisTW.PeakAmplitude > 0 == thisTW.IsPositive;
+                    thisFunvar = thisTW.RatioForPeak + winStep * (isLarge - .5) * 2 * (isConsistent-.5) * 2; % (.5 - isSmall) * 2
+                end
                 
                 if funvarList(end-1) == thisFunvar
                     winStep = winStep / 2;

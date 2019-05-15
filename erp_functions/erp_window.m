@@ -127,6 +127,7 @@ endAmp = grandAvgPosi{1, endFrame};
 tw.MethodCode = method;
 tw.Method = methodName;
 tw.Component = compName;
+tw.IsPositive = isPositive;
 tw.StartFrame = startFrame;
 tw.PeakFrame = thisCheckStart + peakFrame - 1;
 tw.EndFrame = endFrame;

@@ -22,9 +22,11 @@ end
 % topovideo_table = output_topovideo(expCode, saveData);
 
 Mahuika;
-studyPath = [projectPath expCode filesep '04_PreProcessed_Individual_All' filesep];
+fnExtra = '_Detrend';
+% fnExtra = '_NoDetrend';
+studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
 cd(studyPath);
 load([expCode, '_TopoVideoTable']);
 
-% plot_topomapbin(topovideo_table, onsetCode);
-plot_topomapbin(topovideo_table, onsetCode, respCode);
+plot_topomapbin(topovideo_table, onsetCode);
+% plot_topomapbin(topovideo_table, onsetCode, respCode);

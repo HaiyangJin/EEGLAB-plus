@@ -1,4 +1,4 @@
-function topovideo_table = output_topovideo(expCode, saveData)
+function topovideo_table = output_topovideo(expCode, saveData, fnExtra)
 % output the data for plotting topo map or topo video
 
 if nargin < 2
@@ -10,8 +10,9 @@ if ispc || ismac
         'Please select the study folder:');
 else
     Mahuika;
-    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual_All' filesep];
+    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
 end
+fprintf('The study path is:\n%s\n', studyPath);
 cd(studyPath);
 
 trialTable = st_trialmulti;

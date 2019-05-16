@@ -1,4 +1,4 @@
-function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure)
+function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure, fnExtra)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
@@ -76,7 +76,7 @@ if ispc || ismac
         'Please select the study folder:');
 else
     Mahuika;
-    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' filesep];
+    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
 end
 cd(studyPath);
 

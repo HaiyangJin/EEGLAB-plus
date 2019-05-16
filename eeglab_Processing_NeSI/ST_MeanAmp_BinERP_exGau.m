@@ -21,6 +21,8 @@ saveAmpData = 1;
 saveBinEpoch = 1;
 isDistAna = 1;  
 toSaveFigure = 1;
+% fnExtra = '_Detrend';
+fnExtra = '_NoDetrend';
 
 % % Don't fit with ex-Gaussian and don't save image (faster)
 % isDistAna = 0;  % 
@@ -30,4 +32,4 @@ toSaveFigure = 1;
 
 
 %% Conduct the single trial analysis
-st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure);
+st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure, fnExtra);

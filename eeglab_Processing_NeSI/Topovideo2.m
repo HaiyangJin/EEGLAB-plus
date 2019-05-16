@@ -4,6 +4,7 @@ Mahuika;
 
 ID = getenv('SLURM_ARRAY_TASK_ID'); 
 % ID should be 201-216,301-316,401-408,501-508
+% ID for response are 10501-10508,9501-9508,8501-8508,  1501-1508,2501-2508,3501-3508
 
 eeglab;
 
@@ -19,11 +20,13 @@ end
 
 
 %% Output topo video
-% topovideo_table = output_topovideo(expCode, saveData);
-
 Mahuika;
 fnExtra = '_Detrend';
 % fnExtra = '_NoDetrend';
+
+% isReject = 1;
+% topovideo_table = output_topovideo(expCode, saveData, isReject, fnExtra);
+
 studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
 cd(studyPath);
 load([expCode, '_TopoVideoTable']);

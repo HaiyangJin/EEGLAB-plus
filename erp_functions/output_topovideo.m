@@ -1,8 +1,11 @@
-function topovideo_table = output_topovideo(expCode, saveData, fnExtra)
+function topovideo_table = output_topovideo(expCode, saveData, isReject, fnExtra)
 % output the data for plotting topo map or topo video
 
 if nargin < 2
     saveData = 1;
+end
+if nargin < 3
+    isReject = 1;
 end
 
 if ispc || ismac
@@ -15,7 +18,7 @@ end
 fprintf('The study path is:\n%s\n', studyPath);
 cd(studyPath);
 
-trialTable = st_trialmulti;
+trialTable = st_trialmulti('.', [], [], isReject);
 
 [~, isDataColu] = xposition(trialTable.Properties.VariableNames);
 

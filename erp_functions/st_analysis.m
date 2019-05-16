@@ -1,4 +1,4 @@
-function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure, fnExtra)
+function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, isReject, toSaveFigure, fnExtra)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
@@ -46,6 +46,9 @@ if nargin < 5 || isempty(saveBinEpoch)
 end
 if nargin < 6 || isempty(isDistAna)
     isDistAna = 0;
+end
+if nargin < 7 || isempty(isReject)
+    isReject = 1;
 end
 if nargin < 7 || isempty(toSaveFigure)
     toSaveFigure = 0;
@@ -115,7 +118,7 @@ end
 %% Load all the trial epoch data
 fprintf('Reading the raw trial data...\n');
 channels = unique(tw.ChanCluster(:));
-rawTrialTable = st_trialmulti('.', channels); %
+rawTrialTable = st_trialmulti('.', channels, [], isReject); %
 
 % % correct the RT, as there is a offset of about 33ms (comparing with
 % % E-prime results)

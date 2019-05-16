@@ -10,8 +10,9 @@ eeglab;
 % the study folder
 expCode = ['20' ID];
 saveData = 1;
-fnExtra = '_Detrend';
-% fnExtra = '_NoDetrend';
+isReject = 1;
+% fnExtra = '_Detrend';
+fnExtra = '_NoDetrend';
 
 %% Output topo video
-output_topovideo(expCode, saveData, fnExtra);
+output_topovideo(expCode, saveData, isReject, fnExtra);

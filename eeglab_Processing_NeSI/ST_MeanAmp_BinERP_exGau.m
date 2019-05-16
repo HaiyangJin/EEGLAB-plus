@@ -20,6 +20,7 @@ parameters.plotWindow = [-200 996];
 saveAmpData = 1;
 saveBinEpoch = 1;
 isDistAna = 1;  
+isReject = 1;
 toSaveFigure = 1;
 % fnExtra = '_Detrend';
 fnExtra = '_NoDetrend';
@@ -30,6 +31,5 @@ fnExtra = '_NoDetrend';
 
 
 
-
 %% Conduct the single trial analysis
-st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, toSaveFigure, fnExtra);
+st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, isReject, toSaveFigure, fnExtra);

@@ -36,7 +36,10 @@ elseif ispc || ismac
     end
     expCode = ['20' expCodeNum];
     
-    ID = [];
+    %% 1
+%     ID = [];
+    
+    %% 2
 %     switch expCodeNum
 %         case '2'
 %             IDs = 1:16;
@@ -47,8 +50,21 @@ elseif ispc || ismac
 %         case '5'
 %             IDs = 1:8;
 %     end
-%     
-%     ID = arrayfun(@(x) num2str(x, '%02d'), IDs, 'UniformOutput', false);
+%     ID = arrayfun(@(x) [expCodeNum num2str(x, '%02d')], IDs, 'UniformOutput', false);
+    
+    %% 3
+    switch expCodeNum
+        case '2'
+            IDs = 1:8;
+        case '3'
+            IDs = 1:8;
+        case '4'
+            IDs = 1:4;
+        case '5'
+            IDs = 1:4;
+    end
+    ID = arrayfun(@(x) [expCodeNum num2str(x, '%2d')], IDs, 'UniformOutput', false);
+    
     
     studyPath = [uigetdir('.',...
         'Please choose the folder where the clean (PreProcessed) data are saved.'), filesep];

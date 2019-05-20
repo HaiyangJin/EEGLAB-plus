@@ -1,4 +1,4 @@
-function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, isReject, toSaveFigure, fnExtra)
+function st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, isReject, toSaveFigure)
 
 fprintf([repmat('=', 1, 60) '\n' ...
     'Fitting models for the Part %s... \n' ...
@@ -73,15 +73,6 @@ fprintf(['\n' repmat('=', 1, 60), ...
     expCode, isCluster, isgwindow, isDenoise, isColorbar, plotWindow);
 
 paraCode = strrep(num2str([isCluster isgwindow isDenoise  isColorbar]), ' ', '');
-
-if ispc || ismac
-    studyPath = uigetdir(pwd, ...
-        'Please select the study folder:');
-else
-    Mahuika;
-    studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
-end
-cd(studyPath);
 
 
 %% Create folder for saving output images
@@ -167,13 +158,18 @@ nSubRow = 0;
 binFit = struct;
 nBinRow = 0;
 
-switch length(partCode)
-    case 1
-        eventRange = (1:4) + (str2double(partCode) - 1) * 4; % (1:nEvent/2) + nEvent/2 * NS
-        Ntotal = nEvent/4;
-    case 2
-        eventRange = str2double(partCode);
-        Ntotal = nEvent;
+if isempty(partCode)
+    eventRange = 1:nEvent;
+    Ntotal = 1;
+else
+    switch length(partCode)
+        case 1
+            eventRange = (1:4) + (str2double(partCode) - 1) * 4; % (1:nEvent/2) + nEvent/2 * NS
+            Ntotal = nEvent/4;
+        case 2
+            eventRange = str2double(partCode);
+            Ntotal = nEvent;
+    end
 end
 
 for iEvent = eventRange
@@ -463,6 +459,7 @@ for iEvent = eventRange
                     end
                 end
             end
+            close all;
         end
     end
 end
@@ -472,22 +469,22 @@ end
 if isDistAna
     subjFitTable = struct2table(subjFit);
     binFitTable = struct2table(binFit);
-    save([studyPath expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'binFitTable', 'partCode', 'paraCode');
+    save([expCode '_' paraCode '_' partCode '_exGaussian_Output'], 'subjFitTable', 'binFitTable', 'partCode', 'paraCode');
     
     % save the file as *.csv
-    if ispc || ismac
-        subjFitTable = subjFitTable(:, 1:end-1);
-        binFitTable = binFitTable(:, 1:end-1);
-        writetable(subjFitTable, [partCode '_Subj_Output.csv']);
-        writetable(binFitTable, [partCode '_BinFitTable.csv']);
-    end
+%     if ispc || ismac
+%         subjFitTable = subjFitTable(:, 1:end-1);
+%         binFitTable = binFitTable(:, 1:end-1);
+%         writetable(subjFitTable, [partCode '_Subj_Output.csv']);
+%         writetable(binFitTable, [partCode '_BinFitTable.csv']);
+%     end
 end
 
 if saveAmpData
-    save([studyPath expCode '_' paraCode '_' partCode '_ST_MeanAmp'], 'ST_MeanAmpTable');
+    save([expCode '_' paraCode '_' partCode '_ST_MeanAmp'], 'ST_MeanAmpTable');
 end
 if saveBinEpoch
-    save([studyPath expCode '_' paraCode '_' partCode '_ST_BinEpoch'], 'ST_BinEpochTable'); 
+    save([expCode '_' paraCode '_' partCode '_ST_BinEpoch'], 'ST_BinEpochTable'); 
 end
 
 fprintf('\nMission (Fitting model) Completed for %s/%d of the Experiment %s.\n', partCode, Ntotal, expCode);

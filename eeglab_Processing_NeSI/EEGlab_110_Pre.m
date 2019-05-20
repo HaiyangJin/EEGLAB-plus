@@ -140,7 +140,9 @@ for iProcess = 1:nFilter
     %%%% 107 Remove bad channels
     chanStruct = EEG.chanlocs;
 %     EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 8, 0.25);
-    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 20, -1);
+%     EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 20, -1); % 2F new
+    EEG = clean_rawdata(EEG, 5, -1, 0.8, -1, 20, 0.25); % 2F delete
+
     
     %%%% 108 Interpolate all the removed channels
     EEG = pop_interp(EEG,chanStruct,'Spherical');

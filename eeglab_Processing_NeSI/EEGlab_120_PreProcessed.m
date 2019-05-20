@@ -20,7 +20,8 @@
 % % 14. Epoch IC-rejected data to -1 to 2 sec to event onset
 % % (+1) Reject +-500
 % % (+2) Reject improbable data
-% % (+3) Baseline correction
+% % (+3) Linear detrend
+% % (+4) Baseline correction
 % % 15. Create final STUDY specifying full STUDY.design
 
 % If a new user use this one, the folder where raw data are stored should

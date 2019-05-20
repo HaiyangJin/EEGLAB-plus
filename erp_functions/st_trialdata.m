@@ -121,7 +121,7 @@ for iEpoch = 1:nTrial
         Rejjp = zeros(nRow, 1);
     end
     
-    Reject = Rejthresh || Rejjp;
+    Reject = repmat(Rejthresh(1) || Rejjp(1), nRow, 1);
     
     thisIVTable = table(Channel, Event, Urevent, TrialNumber, Block, ...
         Response, urResponse, RT, urRT, Reject, Rejthresh, Rejjp);

@@ -24,7 +24,7 @@ if isunix && ~ismac
     % ID should be 201-216,301-316,401-408  21-24,31-34,41-42
     
     expCode = ['20' ID(1)];
-    IDs = {ID(2:end)};
+    partCodes = {ID(2:end)};
     
     Mahuika;
     studyPath = [projectPath expCode filesep '04_PreProcessed_Individual' fnExtra filesep];
@@ -50,20 +50,20 @@ elseif ispc || ismac
 %         case '5'
 %             IDs = 1:8;
 %     end
-%     ID = arrayfun(@(x) [expCodeNum num2str(x, '%02d')], IDs, 'UniformOutput', false);
+%     ID = arrayfun(@(x) num2str(x, '%02d'), IDs, 'UniformOutput', false);
     
     %% 3
     switch expCodeNum
         case '2'
-            IDs = 1:8;
+            IDs = 1:4;
         case '3'
-            IDs = 1:8;
+            IDs = 1:4;
         case '4'
-            IDs = 1:4;
+            IDs = 1:2;
         case '5'
-            IDs = 1:4;
+            IDs = 1:2;
     end
-    ID = arrayfun(@(x) [expCodeNum num2str(x, '%2d')], IDs, 'UniformOutput', false);
+    partCodes = arrayfun(@(x) num2str(x, '%2d'), IDs, 'UniformOutput', false);
     
     
     studyPath = [uigetdir('.',...
@@ -75,16 +75,16 @@ cd(studyPath);
 
 
 %% Run this job
-if ~isempty(ID)
-    nPart = length(ID);
+if ~isempty(partCodes)
+    nPart = length(partCodes);
 else
     nPart = 1;
 end
 
 for iPart = 1:nPart
     
-    if ~isempty(ID)
-        partCode = ID{iPart};
+    if ~isempty(partCodes)
+        partCode = partCodes{iPart};
     else
         partCode = [];
     end

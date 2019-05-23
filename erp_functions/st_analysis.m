@@ -181,7 +181,7 @@ for iEvent = eventRange
         for iLR = 1:2
             thisLR = LR{iLR};
             
-            theCentChans = tw{iComp, 'ChanCent'};
+            theCentChans = tw{thisComp, 'ChanCent'};
             theCentChan = theCentChans{iLR};
             
             for iResp = 1:length(respCode)

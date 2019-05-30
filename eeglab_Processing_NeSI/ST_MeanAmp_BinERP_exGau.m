@@ -11,8 +11,7 @@ isDistAna = 1;
 isReject = 1;
 toSaveFigure = 0;
 % fnExtra = '_Detrend';
-fnExtra = '_NoDetrend';
-
+% fnExtra = '_NoDetrend';
 
 %% Preparation
 if isunix && ~ismac
@@ -50,29 +49,27 @@ elseif ispc || ismac
 %         case '5'
 %             IDs = 1:8;
 %     end
-%     ID = arrayfun(@(x) num2str(x, '%02d'), IDs, 'UniformOutput', false);
+%     partCodes = arrayfun(@(x) num2str(x, '%02d'), IDs, 'UniformOutput', false);
     
     %% 3
-    switch expCodeNum
-        case '2'
-            IDs = 1:4;
-        case '3'
-            IDs = 1:4;
-        case '4'
-            IDs = 1:2;
-        case '5'
-            IDs = 1:2;
-    end
-    partCodes = arrayfun(@(x) num2str(x, '%2d'), IDs, 'UniformOutput', false);
+%     switch expCodeNum
+%         case '2'
+%             IDs = 1:4;
+%         case '3'
+%             IDs = 1:4;
+%         case '4'
+%             IDs = 1:2;
+%         case '5'
+%             IDs = 1:2;
+%     end
+%     partCodes = arrayfun(@(x) num2str(x, '%2d'), IDs, 'UniformOutput', false);
     
     
     studyPath = [uigetdir('.',...
         'Please choose the folder where the clean (PreProcessed) data are saved.'), filesep];
     
 end
-
 cd(studyPath);
-
 
 %% Run this job
 if ~isempty(partCodes)
@@ -89,11 +86,7 @@ for iPart = 1:nPart
         partCode = [];
     end
     
-    eeglab;
-    
-    % % Don't fit with ex-Gaussian and don't save image (faster)
-    % isDistAna = 0;  %
-    % toSaveFigure = 0;    
+    eeglab;   
     
     %% Conduct the single trial analysis
     st_analysis(expCode, partCode, parameters, saveAmpData, saveBinEpoch, isDistAna, isReject, toSaveFigure);

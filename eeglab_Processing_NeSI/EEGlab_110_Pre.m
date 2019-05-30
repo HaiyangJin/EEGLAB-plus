@@ -223,15 +223,33 @@ EEG = pop_epoch(EEG, events_epoch, [epochStart  epochEnd], 'newname', ICAName,..
     
 %%%% 113 Save the ICAed data for further IC rejection on PC
 [~, EEG] = pop_newset(ALLEEG, EEG, 0,'setname',ICAName,'gui','off');
-EEG = pop_saveset( EEG, 'filename', ICAName, 'filepath', outputPath);
+pop_saveset(EEG, 'filename', ICAName, 'filepath', outputPath);
 
 disp('Save the ICAed file successfully!');
 
-%% automatic delete the artifacts in ICs
-% %%%% 114 Adjust
-% [art] = ADJUST (EEG,ADJUSTOutputName);
-% [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-% 
-% %%%% 115 Removed comoponents
-% EEG = eeg_checkset( EEG );
-% EEG = pop_subcomp( EEG, art, 0);
+%% automatic delete the artifacts in ICs with SASICA
+% clear the data for eeglab
+STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];
+% reload the ICAed data
+EEG = pop_loadset('filename',[ICAName '.set'],'filepath',outputPath);
+
+%%%% 114 SASICA
+disp('Rejecting the componets with SASICA...');
+load('SASICAParameters.mat');
+EEG = eeg_SASICA(EEG, SASICA);
+rejComp = find(EEG.reject.gcompreject);
+
+%%%% 115 Removed comoponents
+EEG = pop_subcomp(EEG, rejComp, 0);
+EEG.reject.SASICArej = rejComp;
+
+%%%% save the automatic rejected files
+rejAuto = '03_Rejected_Auto';
+fn_rejected = [subjCode '_' rejAuto];
+pn_rejected = [expFolderPath rejAuto];
+if ~exist(pn_rejected, 'dir')
+    mkdir(pn_rejected);
+end
+EEG = pop_saveset( EEG, 'filename',fn_rejected,'filepath', pn_rejected);
+
+disp('Data with components removed by SASICA were saved successfully!');

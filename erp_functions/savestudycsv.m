@@ -14,15 +14,15 @@ topoFilename = [expCode '_00_TopoData_' analysisCode];
 % grand mean and time window
 pathMat = ['from210' filesep];
 grandFile = dir([pathMat expCode, '_Grand*.mat']);
-load([grandFile.folder filesep grandFile.name]);
+load([pathMat filesep grandFile.name]);
 
 % load AllChanEpoch
 epochFile = dir([pathMat expCode, '_AllChanEpoch*.mat']);
-load([epochFile.folder filesep epochFile.name]);
+load([pathMat filesep epochFile.name]);
 
 % load topo data
 topoFile = dir([pathMat expCode, '_TopoData*.mat']);
-load([topoFile.folder filesep topoFile.name]);
+load([pathMat filesep topoFile.name]);
 
 
 %% double check the channels for peak 

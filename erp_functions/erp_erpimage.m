@@ -89,7 +89,7 @@ nTrial = sum(isXCluster)/length(chanName);
 groupNum = repmat(1:nTrial, length(chanName), 1);
 
 G = findgroups(groupNum(:));
-dataCluster = splitapply(@mean, dataTable{:,:}, G);
+dataCluster = splitapply(@(x) mean(x, 1), dataTable{:,:}, G);
 
 data = dataCluster(:, logical(isYData));
 

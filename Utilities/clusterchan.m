@@ -17,7 +17,6 @@ clusterNames = channame(clusterArray);
 allCentChan = clusterNames(:, 1);
 
 
-
 if nargin < 1
     centChan = allCentChan;
 else

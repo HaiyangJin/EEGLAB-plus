@@ -35,9 +35,9 @@ topovideo_table = [IV_table, DV_table];
 disp('Topo video data are calculated successfully!');
 
 if saveData
-    fn_topovideo = [expCode, '_TopoVideoTable'];
+    fn_topovideo = [expCode, '_TopoVideoBlockTable'];
     save(fn_topovideo, 'topovideo_table');
-    disp('Topo video data are saved successfully!');
+    disp('Topo video data for blocks are saved successfully!');
 end
 
 end
